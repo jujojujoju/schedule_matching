@@ -2,12 +2,18 @@ var express = require('express');
 var router = express.Router();
 var crawler = require('./crawler');
 var cheerio = require("cheerio");
+var url = require("url");
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
+    res.render('index', {title: 'Express'});
+});
 
-    var user_id = "2012104126";
-    var password = "whgdmstkfka12";
+
+router.post('/main', function (req, res, next) {
+
+    var user_id = req.body.user_id;
+    var password = req.body.password;
 
     crawler.getSchedule(user_id, password, function (res) {
         if (res == false)   console.log("err");
@@ -29,9 +35,7 @@ router.get('/', function (req, res, next) {
         }
     });
 
-
-    res.render('index', {title: 'Express'});
-
+    res.render('main', {title: 'main'});
 
 });
 
