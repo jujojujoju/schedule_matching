@@ -30,9 +30,7 @@ module.exports.getSchedule = function (user_id, password, callback) {
         url: 'https://khuis.khu.ac.kr/java/servlet/khu.cosy.login.loginCheckAction',
         port: 80,
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: "user_id=" + user_id + "&password=" + password + "&RequestData="
     };
 
