@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('schedule-matching:server');
 var http = require('http');
+var socketio = require('socket.io');
 
 /**
  * Get port from environment and store in Express.
@@ -28,6 +29,35 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+var io = socketio.listen(server);
+
+io.on('connection', function (socket) {
+    console.log('a user connected');
+    var room_id;
+
+    socket.on('joinRoom', function (data, name) {
+        room_id = data;
+        socket.join(room_id); //룸입장
+        io.sockets.in(room_id).emit('msgAlert', name + '이 입장했습니다.',""+room_id);//자신포함 전체 룸안의 유저
+    });
+
+    socket.on('sendMsg', function (data) {
+        io.sockets.in(room_id).emit('msgAlert', data,""+room_id);//자신포함 전체 룸안의 유저
+        // socket.broadcast.to(room_id).emit('msgAlert',data); //자신 제외 룸안의 유저
+        //socket.in(room_id).emit('msgAlert',data); //broadcast 동일하게 가능 자신 제외 룸안의 유저
+        // io.of('namespace').in(room_id).emit('msgAlert', data) //of 지정된 name space의 유저의 룸
+    });
+
+    socket.on('disconnect', function () {
+        socket.leave(room_id);//룸퇴장
+        console.log('OUT ROOM LIST', io.sockets.adapter.rooms);
+        console.log('user disconnected');
+    });
+
+});
+
+
 
 /**
  * Normalize a port into a number, string, or false.

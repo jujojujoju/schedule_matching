@@ -26,6 +26,7 @@ module.exports.getSchedule = function (user_id, password, callback) {
         return str;
     }
 
+    //첫 로그인
     var options = {
         url: 'https://khuis.khu.ac.kr/java/servlet/khu.cosy.login.loginCheckAction',
         port: 80,
@@ -34,61 +35,92 @@ module.exports.getSchedule = function (user_id, password, callback) {
         body: "user_id=" + user_id + "&password=" + password + "&RequestData="
     };
 
-    var req = request(options);
+    var loginReq = request(options);
 
-    req.on('response', function (res) {
+    loginReq.on('response', function (res) {
         res.setEncoding('utf8');
-
         res.on('end', function () {
             setCookie(res.headers["set-cookie"]);
-
             options = {
-                url: 'https://khuis.khu.ac.kr/java/servlet/controllerCosy?' +
-                'action=17&WID=hsip1004&Pkg=JSP&URL=' +
-                'JSP./jsp/hssu/infospace/SugangSearchPrintList.jsp[(QUES)]auto=off',
+                url: 'https://khuis.khu.ac.kr/java/servlet/controllerCosy?action=19&menuId=hsip&startpage=start',
                 port: 80,
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Whale/0.10.36.20 Safari/537.36',
                     'Cookie': getCookie()
                 }
             };
 
-            var req2 = request(options);
-            req2.on('response', function (res) {
+            var proflieReq = request(options);
+            proflieReq.on('response', function (res) {
                 res.setEncoding('utf8');
-                res.on('end', function () {
+                var profile = '';
+                res.on('data', function (chunk) {
+                    profile += chunk;
+                });
 
+                res.on('end', function () {
                     setCookie(res.headers["set-cookie"]);
 
                     options = {
-                        url: 'https://khuis.khu.ac.kr/java/servlet/controllerHssu',
+                        url: 'https://khuis.khu.ac.kr/java/servlet/controllerCosy?' +
+                        'action=17&WID=hsip1004&Pkg=JSP&URL=' +
+                        'JSP./jsp/hssu/infospace/SugangSearchPrintList.jsp[(QUES)]auto=off',
                         port: 80,
-                        method: 'POST',
+                        method: 'GET',
                         headers: {
-                            'Host': "khuis.khu.ac.kr",
                             'Content-Type': 'application/x-www-form-urlencoded',
                             'Cookie': getCookie()
-                        },
-                        encoding: null,
-                        body: "action=655&auto=off&lectYear=2017&lectTerm=20"
+                        }
                     };
-
-                    var req3 = request(options);
-                    req3.on('response', function (res) {
-                        var output = new Buffer([]);
-
-                        res.on('data', function (chunk) {
-                            output = Buffer.concat([output, chunk]);
-                        });
-
+                    var middleReq = request(options);
+                    middleReq.on('response', function (res) {
+                        res.setEncoding('utf8');
                         res.on('end', function () {
-                            callback(iconv.convert(output).toString());
 
+                            setCookie(res.headers["set-cookie"]);
+
+                            options = {
+                                url: 'https://khuis.khu.ac.kr/java/servlet/controllerHssu',
+                                port: 80,
+                                method: 'POST',
+                                headers: {
+                                    'Host': "khuis.khu.ac.kr",
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                    'Cookie': getCookie()
+                                },
+                                encoding: null,
+                                body: "action=655&auto=off&lectYear=2017&lectTerm=20"
+                            };
+
+                            var classReq = request(options);
+                            classReq.on('response', function (res) {
+
+                                var classOutput = new Buffer([]);
+
+                                res.on('data', function (chunk) {
+                                    classOutput = Buffer.concat([classOutput, chunk]);
+                                });
+
+                                res.on('end', function () {
+                                    setCookie(res.headers["set-cookie"]);
+                                    var class_string = iconv.convert(classOutput).toString();
+                                    var crawledData = {};
+                                    crawledData['profile'] = profile;
+                                    crawledData['class'] = class_string;
+                                    callback(crawledData);
+
+                                });
+                            });
                         });
-                    });
+                    })
+
+
                 });
-            })
+
+            });
+
+
         });
     }).on('error', function (err) {
         console.log(err);

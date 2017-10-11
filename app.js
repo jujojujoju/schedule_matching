@@ -5,6 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+// var RedisStore = require('connect-redis')(session);
+// var FileStore = require('session-file-store')(session);
+// var cookieSession = require('cookie-session');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -26,11 +29,17 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+//
+// app.use(cookieSession({
+//     name: 'session',
+//     keys: [/* secret keys */],
+    // maxAge: 24 * 60 * 60 * 1000 // 24 hours
+// }));
 app.use('/', index);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function(r1eq, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);

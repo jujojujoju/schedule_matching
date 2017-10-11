@@ -4,21 +4,118 @@
 <link href="/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <script src="/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <style>
+
+        form {
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 50%;
+            margin: 30px 15%
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #messages li {
+            padding: 5px 10px;
+        }
+
+        #messages li:nth-child(odd) {
+            background: #eee;
+        }
+
+        .container {
+            width: 70%;
+            margin-left: 20%;
+        }
+
+        .sidebar {
+            border-radius: 20px;
+            position: fixed;
+            width: 200px;
+            height: 55%;
+            margin-top: 100px;
+            margin-left: 30px;
+            background: #e0e0e0;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            color: white;
+            font-size: 100%;
+        }
+
+        .sidebar-nav {
+            width: 220px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            border-bottom: 1px solid white;
+            text-indent: 1.0em;
+            line-height: 2.8em;
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-asdfasdfasfsf
+<div class="container">
+
+    <div class="row">
+
+        <ul id="messages"></ul>
+
+        <form id="messageForm" action="">
+            <input style=" padding: 10px; width: 80%;" id="m" autocomplete="off"/>
+            <button class="btn btn-default" style="padding: 10px; width: 18%;">Send</button>
+        </form>
+
+    </div>
+
+</div>
 
 </body>
 
-<script type="text/javascript">
+<script>
+    var name = '<%= userName %>';
+    var roomName = "test room";
+
+    $(function () {
+        $("#m").focus();
+        var socket = io();
+        socket.emit('joinRoom', roomName, name);
+
+        socket.on('msgAlert', function (msg, room_id) {
+            $('#messages').append($('<li>').text(msg));
+        });
+
+        $('#messageForm').submit(function () {
+            if ($('#m').val() != '') {
+                socket.emit('sendMsg', name + ' : ' + $('#m').val());
+                $('#m').val('');
+            }
+            return false;
+        });
+
+    });
+
 
 </script>
 
