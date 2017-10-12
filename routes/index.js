@@ -21,8 +21,9 @@ function isNotLogin(req, res, next) {
 }
 
 router.get('/logout', function (req, res) {
-    req.session.destroy();
-    res.render('index');
+    req.session.destroy(function (err) {
+        res.redirect('/');
+    });
 });
 
 router.get('/', isNotLogin, function (req, res, next) {
@@ -75,13 +76,11 @@ router.post('/login', isNotLogin, function (req, res, next) {
                     userName: userName, major: major, degree: degree,
                     scname: className, scprofessor: professor, sctime: classTime
                 };
-            }
-            else {
-                res.redirect("/?login_error=1");
+                res.redirect("/main");
                 return;
             }
         }
-        res.redirect("/main");
+        res.redirect("/?login_error=1");
     });
 });
 
