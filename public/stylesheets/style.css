@@ -1,8 +1,57 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+
+form {
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 50%;
+    margin: 30px 15%
 }
 
-a {
-  color: #00B7FF;
+#messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#messages li {
+    padding: 5px 10px;
+}
+
+#messages li:nth-child(odd) {
+    background: #eee;
+}
+
+.container {
+    width: 70%;
+    margin-left: 20%;
+}
+
+.sidebar {
+    border-radius: 20px;
+    position: fixed;
+    width: 200px;
+    height: 55%;
+    margin-top: 100px;
+    margin-left: 30px;
+    background: #e0e0e0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sidebar-brand {
+    color: white;
+    font-size: 100%;
+}
+
+.sidebar-nav {
+    width: 220px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    border-bottom: 1px solid white;
+    text-indent: 1.0em;
+    line-height: 2.8em;
 }

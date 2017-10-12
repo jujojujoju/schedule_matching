@@ -27,14 +27,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     secret: '@#@$MYSIGN#@$#$',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie  : { maxAge  : new Date(Date.now() + (60 * 1000000 * 1)) }
 }));
-//
-// app.use(cookieSession({
-//     name: 'session',
-//     keys: [/* secret keys */],
-    // maxAge: 24 * 60 * 60 * 1000 // 24 hours
-// }));
 app.use('/', index);
 app.use('/users', users);
 

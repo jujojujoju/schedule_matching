@@ -4,24 +4,45 @@ var crawler = require('./crawler');
 var cheerio = require("cheerio");
 var url = require("url");
 
-var users = [];
+function isLogin(req, res, next) {
+    if (req.session.info != undefined) {
+        next();
+    } else {
+        res.redirect("/");
+    }
+}
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
+function isNotLogin(req, res, next) {
+    if (req.session.info == undefined) {
+        next();
+    } else {
+        res.redirect("/main");
+    }
+}
+
+router.get('/logout', function (req, res) {
+    req.session.destroy();
     res.render('index');
 });
 
-router.post('/main', function (req, res, next) {
+router.get('/', isNotLogin, function (req, res, next) {
+    var params = url.parse(req.url, true).query;
+    var data = {error: false};
 
-    // var user = {
-    //     userID: req.body.user_id,
-    //     password: req.body.password
-    // };
-    // users.push(user);
+    if (params["login_error"] == "1") {
+        data.error = true;
+    }
+    res.render('index', data);
+});
+
+router.get('/main', isLogin, function (req, res, next) {
+    res.render('main', req.session.info);
+});
+
+router.post('/login', isNotLogin, function (req, res, next) {
 
     req.session.user_id = req.body.user_id;
     req.session.password = req.body.password;
-    req.session.save();
 
     crawler.getSchedule(req.session.user_id, req.session.password, function (crawler_res) {
         if (crawler_res == false) console.log("err");
@@ -49,28 +70,23 @@ router.post('/main', function (req, res, next) {
                     degree = profile[i];
             }
 
-            // console.log(userName);
-            // console.log(major);
-            // console.log(degree);
-
-            req.session.userName = userName;
-            res.render('main', {
-                userName: userName, major: major, degree: degree,
-                scname: className, scprofessor: professor, sctime: classTime
-            });
-
+            if (userName != null) {
+                req.session.info = {
+                    userName: userName, major: major, degree: degree,
+                    scname: className, scprofessor: professor, sctime: classTime
+                };
+            }
+            else {
+                res.redirect("/?login_error=1");
+                return;
+            }
         }
+        res.redirect("/main");
     });
-
 });
 
-router.get('/chat', function (req, res, next) {
-
-    console.log(req.session.user_id);
-    console.log(req.session.password);
-    console.log(req.session.userName);
-
-    res.render('chat', {userName: req.session.user_id});
+router.get('/chat', isLogin, function (req, res, next) {
+    res.render('chat', {userName: req.session.info["userName"]});
 
 });
 
