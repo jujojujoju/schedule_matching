@@ -1,8 +1,7 @@
 <% include header.ejs %>
 
-
 <link href="/stylesheets/style.css" rel="stylesheet"></link>
-<script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/socket.io.js"></script>
 
 <body>
 
@@ -26,11 +25,11 @@
 <script>
     var name = '<%= userName %>';
     var roomName = "test room";
+    var socket = io.connect(window.location.origin);
 
     $(function () {
         $("#m").focus();
-        var socket = io();
-        socket.emit('joinRoom', roomName, name);
+        socket.emit('joinRoom', roomName);
 
         socket.on('msgAlert', function (msg, room_id) {
             $('#messages').append($('<li>').text(msg));

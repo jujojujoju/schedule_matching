@@ -36,7 +36,6 @@ module.exports.getSchedule = function (user_id, password, callback) {
     };
 
     var loginReq = request(options);
-
     loginReq.on('response', function (res) {
         res.setEncoding('utf8');
         res.on('end', function () {
@@ -95,7 +94,6 @@ module.exports.getSchedule = function (user_id, password, callback) {
 
                             var classReq = request(options);
                             classReq.on('response', function (res) {
-
                                 var classOutput = new Buffer([]);
 
                                 res.on('data', function (chunk) {
@@ -109,22 +107,15 @@ module.exports.getSchedule = function (user_id, password, callback) {
                                     crawledData['profile'] = profile;
                                     crawledData['class'] = class_string;
                                     callback(crawledData);
-
                                 });
                             });
                         });
                     })
-
-
                 });
-
             });
-
-
         });
     }).on('error', function (err) {
         console.log(err);
         callback(false);
     });
-
 };

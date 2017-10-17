@@ -61,7 +61,6 @@ router.post('/login', isNotLogin, function (req, res, next) {
             var studentElement = $("#GNB-student");
             var userInfo = studentElement.find("p:nth-child(1)").text();
             var profile = studentElement.find("p:nth-child(2)").text();
-
             var userName = userInfo.split(" ")[3];
             var major = profile.split(" ")[4];
             var degree;
