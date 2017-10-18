@@ -73,7 +73,7 @@ router.post('/login', isNotLogin, function (req, res, next) {
             if (userName != null) {
                 req.session.info = {
                     userName: userName, major: major, degree: degree,
-                    scname: className, scprofessor: professor, sctime: classTime
+                    className: className, professor: professor, classTime: classTime
                 };
                 res.redirect("/main");
                 return;
@@ -84,7 +84,7 @@ router.post('/login', isNotLogin, function (req, res, next) {
 });
 
 router.get('/chat', isLogin, function (req, res, next) {
-    res.render('chat', {userName: req.session.info["userName"]});
+    res.render('chat', req.session.info);
 
 });
 

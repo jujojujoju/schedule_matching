@@ -55,20 +55,20 @@ var SessionSockets = require('session.socket.io')
 
 sessionSockets.on('connection', function (err, socket, session) {
 //io.on('connection', function (socket) {
-    if (err) return;
+    if (err || !session || !session.info) return;
 
     var room_id;
-    console.log(session);
+    // console.log(session);
+    var name = session.info["userName"];
+
     socket.on('joinRoom', function (data) {
         room_id = data;
-        var name = session.info["userName"];
-
         socket.join(room_id); //룸입장
         io.sockets.in(room_id).emit('msgAlert', name + '이 입장했습니다.', "" + room_id);//자신포함 전체 룸안의 유저
     });
 
     socket.on('sendMsg', function (data) {
-        io.sockets.in(room_id).emit('msgAlert', data, "" + room_id);//자신포함 전체 룸안의 유저
+        io.sockets.in(room_id).emit('msgAlert', name + ' : ' + data, "" + room_id);//자신포함 전체 룸안의 유저
         // socket.broadcast.to(room_id).emit('msgAlert',data); //자신 제외 룸안의 유저
         //socket.in(room_id).emit('msgAlert',data); //broadcast 동일하게 가능 자신 제외 룸안의 유저
         // io.of('namespace').in(room_id).emit('msgAlert', data) //of 지정된 name space의 유저의 룸
