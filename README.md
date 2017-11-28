@@ -14,5 +14,5 @@ npm install
 Run the following command to start node server
 
 ```sh
-node bin/www
+node app.js
 ```
