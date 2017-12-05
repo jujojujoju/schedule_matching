@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<link rel='stylesheet' href='/fullcalendar/dist/fullcalendar.css'/>
+<script src="/javascripts/jquery-3.1.0.min.js"></script>
+<script src='/moment/min/moment.min.js'></script>
+<script src='/fullcalendar/dist/fullcalendar.js'></script>
+
+<script>
+    $(document).ready(function () {
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            events: [
+                {
+                    title: 'My Event',
+                    start: '2017-11-15',
+                    description: 'This is a cool event',
+                    backgroundColor:'red'
+                }
+            ],
+            editable: true,
+//            eventDrop: function(event, delta, revertFunc) {
+//                alert(event.title + " was dropped on " + event.start.format());
+//
+//            },
+            dayClick: function (start, end, jsEvent, view) {
+                var abc = prompt('Enter Title');
+//                var allDay = !start.hasTime && !end.hasTime;
+                var newEvent = {};
+                newEvent.title = abc;
+                newEvent.start = moment(start).format();
+                newEvent.editable = true;
+                $('#calendar').fullCalendar('renderEvent', newEvent);
+            }
+        });
+    });
+</script>
+
+<body>
+
+<div class="container">
+
+    <div id='calendar'></div>
+
+</div>
+
+</body>
+
+</html>

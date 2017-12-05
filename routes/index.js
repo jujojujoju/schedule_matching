@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var crawler = require('./crawler');
+var crawler = require('./../crawler/crawler');
 var cheerio = require("cheerio");
 var url = require("url");
 
@@ -37,7 +37,10 @@ router.get('/', isNotLogin, function (req, res, next) {
 });
 
 router.get('/main', isLogin, function (req, res, next) {
-    res.render('main', req.session.info);
+    // res.render('main', req.session.info);
+    res.render('weekTest');
+    //
+    // res.render('calendarTest');
 });
 
 router.post('/login', isNotLogin, function (req, res, next) {
