@@ -159,4 +159,4 @@ bin/sessions
 package-lock.json
 db/db_config.json
 drivers
-
+bin
