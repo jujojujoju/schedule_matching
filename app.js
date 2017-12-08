@@ -9,6 +9,7 @@ var session = require('express-session');
 var sessionStore = new require('session-memory-store')(session)();
 var socketio = require('socket.io');
 var myCookieParser = cookieParser('@#@$MYSIGN#@$#$');
+var db_init = require('./db/db_init');
 
 // var RedisStore = require('connect-redis')(session);
 // var FileStore = require('session-file-store')(session);
@@ -40,7 +41,7 @@ app.use(session({
 }));
 app.use('/', index);
 app.use('/users', users);
-var port = 3000;
+var port = 9898;
 app.set('port', port);
 
 var server = http.createServer(app);
@@ -85,7 +86,16 @@ sessionSockets.on('connection', function (err, socket, session) {
 });
 
 
-server.listen(port);
+// db initialize
+db_init.init(function (err) {
+    if (err) {
+        console.log(err);
+    } else {
+        server.listen(port, function(){
+            console.log('Server running at : ' + port);
+        });
+    }
+});
 
 // catch 404 and forward to error handler
 app.use(function (r1eq, res, next) {
