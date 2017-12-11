@@ -61,13 +61,16 @@ sessionSockets.on('connection', function (err, socket, session) {
 
     var room_id;
     var name = session.info["userName"];
-
-    setInterval(function() {
-        console.info('broadcasting heartbeat');
+    var id = session.info["userid"];
+    setInterval(function () {
+        // console.info('broadcasting heartbeat');
         // socket.broadcast.emit('heartbeat', /* custom heartbeat*/);
         // io.sockets.in(room_id).emit('heartbeat', "" + new Date());//자신포함 전체 룸안의 유저
-        io.sockets.in(room_id).emit('heartbeat', "" + new Date(),  "" + room_id, io.sockets.adapter.rooms[room_id].length, io.sockets.adapter.rooms[room_id].members);//자신포함 전체 룸안의 유저
-
+        if (io.sockets.adapter.rooms[room_id] != undefined && io.sockets.adapter.rooms[room_id] != null)
+            io.sockets.in(room_id).emit('heartbeat', "" + new Date(), "" +
+                room_id, io.sockets.adapter.rooms[room_id].length,
+                io.sockets.adapter.rooms[room_id].members,
+                io.sockets.adapter.rooms[room_id].memberids);//자신포함 전체 룸안의 유저
     }, 1000);
 
     socket.on('joinRoom', function (data) {
@@ -79,15 +82,24 @@ sessionSockets.on('connection', function (err, socket, session) {
             io.sockets.adapter.rooms[room_id].members = [];
         io.sockets.adapter.rooms[room_id].members.push(name);
 
+        if (io.sockets.adapter.rooms[room_id].memberids == null || io.sockets.adapter.rooms[room_id].memberids == undefined)
+            io.sockets.adapter.rooms[room_id].memberids = [];
+        io.sockets.adapter.rooms[room_id].memberids.push(id);
+
+        io.sockets.adapter.rooms[room_id].memberids = io.sockets.adapter.rooms[room_id].memberids.filter(function (elem, pos) {
+            return io.sockets.adapter.rooms[room_id].memberids.indexOf(elem) == pos;
+        });
         io.sockets.adapter.rooms[room_id].members = io.sockets.adapter.rooms[room_id].members.filter(function (elem, pos) {
             return io.sockets.adapter.rooms[room_id].members.indexOf(elem) == pos;
         });
 
         console.log("clients num : " + io.sockets.adapter.rooms[room_id].length);
         console.log("clients object : " + io.sockets.adapter.rooms[room_id].members);
+        // console.log("clients object : " + io.sockets.adapter.rooms[room_id].members);
 
         console.log("id : " + name);
-        io.sockets.in(room_id).emit('msgAlert', name + '이 입장했습니다.', "" + room_id, io.sockets.adapter.rooms[room_id].length, io.sockets.adapter.rooms[room_id].members);//자신포함 전체 룸안의 유저
+        io.sockets.in(room_id).emit('msgAlert', name + '이 입장했습니다.', "" + room_id
+        );//자신포함 전체 룸안의 유저
     });
 
     socket.on('sendMsg', function (data) {
