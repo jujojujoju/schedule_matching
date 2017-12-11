@@ -28,7 +28,7 @@ var db_init = {
                 console.log(err)
             } else {
                 console.log("Using connection: " + connObj.uuid);
-                connObj.conn.setSchema("TEST2", function (err) {
+                connObj.conn.setSchema("DESIGN", function (err) {
                     if (err) {
                         console.log(err);
                     } else {

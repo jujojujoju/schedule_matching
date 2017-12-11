@@ -54,18 +54,25 @@ var io = socketio.listen(server);
 var SessionSockets = require('session.socket.io')
     , sessionSockets = new SessionSockets(io, sessionStore, myCookieParser, "connect.sid");
 
-
 sessionSockets.on('connection', function (err, socket, session) {
-//io.on('connection', function (socket) {
     if (err || !session || !session.info) return;
 
     var room_id;
     // console.log(session);
     var name = session.info["userName"];
+    // console.log(io.sockets.adapter.rooms[room_id].length);
+
+    // console.log(sessionSockets.sockets.adapter.rooms[room_id].length);
+
 
     socket.on('joinRoom', function (data) {
         room_id = data;
+
         socket.join(room_id); //룸입장
+        // console.log("sefsaefd");
+        console.log("clients num : " + io.sockets.adapter.rooms[room_id].length);
+        console.log("id : " + name);
+
         io.sockets.in(room_id).emit('msgAlert', name + '이 입장했습니다.', "" + room_id);//자신포함 전체 룸안의 유저
     });
 
@@ -77,7 +84,6 @@ sessionSockets.on('connection', function (err, socket, session) {
     });
 
     socket.on('disconnect', function () {
-
         socket.leave(room_id);//룸퇴장
         console.log('OUT ROOM LIST', io.sockets.adapter.rooms);
         console.log('user disconnected');

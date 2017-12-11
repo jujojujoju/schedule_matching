@@ -66,14 +66,26 @@ module.exports.signup = function (input, callback) {
                                             return count2 < input.classinfo.prof_time[key].length
                                         },
                                         function (c2) {
-                                            query = "INSERT INTO CLASS VALUES ('"
+                                            // query = "INSERT INTO CLASS VALUES ('"
+                                            //     + input.classinfo.classid[count1] + "','"
+                                            //     + input.classinfo.classname[count1] + "','"
+                                            //     + key + "','"
+                                            //     + input.classinfo.prof_time[key][count2].day + "','"
+                                            //     + input.classinfo.prof_time[key][count2].starttime + "','"
+                                            //     + input.classinfo.prof_time[key][count2].endtime + "','"
+                                            //     + input.classinfo.prof_time[key][count2].loc + "')";
+                                            query = "INSERT INTO CLASS ( classid ,classname, profname, day, starttime, endtime, classloc) SELECT '"
                                                 + input.classinfo.classid[count1] + "','"
                                                 + input.classinfo.classname[count1] + "','"
                                                 + key + "','"
                                                 + input.classinfo.prof_time[key][count2].day + "','"
                                                 + input.classinfo.prof_time[key][count2].starttime + "','"
                                                 + input.classinfo.prof_time[key][count2].endtime + "','"
-                                                + input.classinfo.prof_time[key][count2].loc + "')";
+                                                + input.classinfo.prof_time[key][count2].loc + "' " +
+                                                "from dual where not exists " +
+                                                "(select * from CLASS where classid= '"
+                                                + input.classinfo.classid[count1] + "' and day= '" + input.classinfo.prof_time[key][count2].day +"' )"
+                                            console.log(query);
                                             statement.executeUpdate(query,
                                                 function (err, c3) {
                                                     if (err) {
