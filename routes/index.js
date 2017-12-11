@@ -83,7 +83,7 @@ router.post('/login', isNotLogin, function (req, res, next) {
                                 var time1 = $(this).find("td:nth-child(8)").text().split(/[\s|-]+/).filter(function (e) {
                                     return !!e;
                                 });
-                                if (time1.length == 4) {
+                                if (time1.length >= 4) {
                                     classidArray.push(classid1);
                                     classnameArray.push(className1);
                                     if (!prof_time[prof1]) {
