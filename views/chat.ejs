@@ -67,16 +67,16 @@
             return false;
         });
 
-        $.ajax({
-            url: '/class/getlist',
-            type: 'POST',
-            data: {userID: userID},
-            success: function (result) {
-                for (var i = 0; i < result.length; i++) {
-                    $('#classes').append($('<li>').text(result[i].));
-                }
-            }
-        });
+//        $.ajax({
+//            url: '/class/getsch',
+//            type: 'POST',
+//            data: {userID: userID},
+//            success: function (result) {
+//                for (var i = 0; i < result.length; i++) {
+//                    $('#classes').append($('<li>').text(result[i].));
+//                }
+//            }
+//        });
     });
 
 
