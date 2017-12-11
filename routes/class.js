@@ -26,6 +26,38 @@ router.get('/', isLogin, function (req, res, next) {
     })
 });
 
+router.get('/page',isLogin,function(req,res,next){
+    var params = url.parse(req.url, true).query;
+    var cid = params["cid"];
+    console.log("cidddddddddddddddddddddd");
+    console.log(cid);
+    var class_info;
+    //수업정보를 받아오고~
+    db_.getClassInfo(cid,function(results){
+        //수업의 종류에 따라 구분하여 class_info 넣어줌
+        if(results.length == 1){
+            class_info = {
+                c_Length : 1,
+                c_Name : results[0].CLASSNAME,
+                c_Prof : results[0].PROFNAME,
+                c_Time : results[0].STARTTIME + "~" + results[0].ENDTIME,
+                c_Day : results[0].DAY
+            }
+        }
+        else{
+            class_info = {
+                c_Length : 2,
+                c_Name : results[0].CLASSNAME,
+                c_Prof : results[0].PROFNAME,
+                c_Time : results[0].STARTTIME + "~" + results[0].ENDTIME,
+                c_Day : results[0].DAY +","+results[1].DAY
+            }
+        }
+        //board ejs로 render
+        res.render('class_board',class_info);
+    })
+})
+
 // 그룹페이지에서 각 주별스케줄을 보여주기위해
 router.post('/getsch', function (req, res, next) {
     var dataArray = req.body.userIDs;
