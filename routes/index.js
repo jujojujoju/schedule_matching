@@ -169,13 +169,11 @@ router.post('/login', isNotLogin, function (req, res, next) {
         }
     })
     ;
-})
-;
+});
 
 
 router.get('/chat', isLogin, function (req, res, next) {
     res.render('chat', req.session.info);
-
 });
 
 
