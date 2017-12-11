@@ -67,19 +67,16 @@
             return false;
         });
 
-//        $.ajax({
-//            url: '/class/getlist',
-//            type: 'POST',
-//            data: {userID: userID},
-//            success: function (result) {
-//                for (var i = 0; i < result.length; i++) {
-////                    $("#s" + i + "").html(result[i].TITLE);
-////                    $("#s" + i + "").attr("target", "_blank");
-////                    $("#s" + i + "").attr("href", result[i].LINK);
-//                    $('#classes').append($('<li>').text(result[i].));
-//                }
-//            }
-//        });
+        $.ajax({
+            url: '/class/getlist',
+            type: 'POST',
+            data: {userID: userID},
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                    $('#classes').append($('<li>').text(result[i].));
+                }
+            }
+        });
     });
 
 
