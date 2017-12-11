@@ -178,4 +178,27 @@ router.get('/chat', isLogin, function (req, res, next) {
 
 });
 
+router.get('/class', isLogin, function (req, res, next) {
+
+    var data
+    db_.getClassList(req.session.info.userid,function(results){
+        for(var i = 0 ; i < results.length;i++){
+            console.log(results[i].CLASSID + "   "+results[i].CLASSNAME);
+        }
+        console.log(results.length);
+        var a = results.length;
+        data= {
+            _class : results
+        };
+        res.render('class', data);
+    })
+});
+
+/*
+router.get('/class/:classid', isLogin, function (req, res, next) {
+    var params = url.parse(req.url, true).query;
+}
+ */
+
+
 module.exports = router;
