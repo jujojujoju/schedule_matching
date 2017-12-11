@@ -69,19 +69,19 @@ router.post('/login', isNotLogin, function (req, res, next) {
                         scheduleElement.each(function () {
                             if (rowcount >= 2) {
                                 var classid1 = $(this).find("td:nth-child(2)").text().split(/\s+/).filter(function (e) {
-                                    return e ? true : false;
+                                    return !!e;
                                 }).join("");
                                 var className1 = $(this).find("td:nth-child(3)").text().split(/\s+/).filter(function (e) {
-                                    return e ? true : false;
+                                    return !!e;
                                 }).join("");
                                 var point1 = $(this).find("td:nth-child(4)").text().split(/\s+/).filter(function (e) {
-                                    return e ? true : false;
+                                    return !!e;
                                 }).join("");
                                 var prof1 = $(this).find("td:nth-child(7)").text().split(/\s+/).filter(function (e) {
-                                    return e ? true : false;
+                                    return !!e;
                                 }).join("");
                                 var time1 = $(this).find("td:nth-child(8)").text().split(/[\s|-]+/).filter(function (e) {
-                                    return e ? true : false;
+                                    return !!e;
                                 });
                                 if (time1.length == 4) {
                                     classidArray.push(classid1);
@@ -100,10 +100,10 @@ router.post('/login', isNotLogin, function (req, res, next) {
                             rowcount++
                         });
                         classidArray = classidArray.filter(function (e) {
-                            return e ? true : false;
+                            return !!e;
                         });
                         classnameArray = classnameArray.filter(function (e) {
-                            return e ? true : false;
+                            return !!e;
                         });
                         console.log(classidArray);
                         console.log(classnameArray);
@@ -122,7 +122,6 @@ router.post('/login', isNotLogin, function (req, res, next) {
                             if (profile[i] >= '0' && profile[i] <= '9')
                                 degree = profile[i];
                         }
-
                         var userinfo = {
                             userid: userid, password: password,
                             userName: userName, major: major, degree: degree
@@ -141,7 +140,7 @@ router.post('/login', isNotLogin, function (req, res, next) {
                             };
                             db_.signup(data, function (result) {
                                 if (result) {
-                                    console.log("new user data input complete")
+                                    console.log("new user data input complete");
                                     res.redirect('/main');
                                 }
                                 else {

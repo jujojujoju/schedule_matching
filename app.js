@@ -17,6 +17,7 @@ var db_init = require('./db/db_init');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var classes = require('./routes/class');
 var app = express();
 
 
@@ -41,6 +42,7 @@ app.use(session({
 }));
 app.use('/', index);
 app.use('/users', users);
+app.use('/class', classes);
 var port = 9898;
 app.set('port', port);
 
@@ -58,26 +60,38 @@ sessionSockets.on('connection', function (err, socket, session) {
     if (err || !session || !session.info) return;
 
     var room_id;
-    // console.log(session);
     var name = session.info["userName"];
-    // console.log(io.sockets.adapter.rooms[room_id].length);
 
-    // console.log(sessionSockets.sockets.adapter.rooms[room_id].length);
+    setInterval(function() {
+        console.info('broadcasting heartbeat');
+        // socket.broadcast.emit('heartbeat', /* custom heartbeat*/);
+        // io.sockets.in(room_id).emit('heartbeat', "" + new Date());//자신포함 전체 룸안의 유저
+        io.sockets.in(room_id).emit('heartbeat', "" + new Date(),  "" + room_id, io.sockets.adapter.rooms[room_id].length, io.sockets.adapter.rooms[room_id].members);//자신포함 전체 룸안의 유저
 
+    }, 1000);
 
     socket.on('joinRoom', function (data) {
         room_id = data;
-
         socket.join(room_id); //룸입장
-        // console.log("sefsaefd");
-        console.log("clients num : " + io.sockets.adapter.rooms[room_id].length);
-        console.log("id : " + name);
+        console.log(room_id + " 입장");
 
-        io.sockets.in(room_id).emit('msgAlert', name + '이 입장했습니다.', "" + room_id);//자신포함 전체 룸안의 유저
+        if (io.sockets.adapter.rooms[room_id].members == null || io.sockets.adapter.rooms[room_id].members == undefined)
+            io.sockets.adapter.rooms[room_id].members = [];
+        io.sockets.adapter.rooms[room_id].members.push(name);
+
+        io.sockets.adapter.rooms[room_id].members = io.sockets.adapter.rooms[room_id].members.filter(function (elem, pos) {
+            return io.sockets.adapter.rooms[room_id].members.indexOf(elem) == pos;
+        });
+
+        console.log("clients num : " + io.sockets.adapter.rooms[room_id].length);
+        console.log("clients object : " + io.sockets.adapter.rooms[room_id].members);
+
+        console.log("id : " + name);
+        io.sockets.in(room_id).emit('msgAlert', name + '이 입장했습니다.', "" + room_id, io.sockets.adapter.rooms[room_id].length, io.sockets.adapter.rooms[room_id].members);//자신포함 전체 룸안의 유저
     });
 
     socket.on('sendMsg', function (data) {
-        io.sockets.in(room_id).emit('msgAlert', name + ' : ' + data, "" + room_id);//자신포함 전체 룸안의 유저
+        io.sockets.in(room_id).emit('msgAlert', name + ' : ' + data);//자신포함 전체 룸안의 유저
         // socket.broadcast.to(room_id).emit('msgAlert',data); //자신 제외 룸안의 유저
         //socket.in(room_id).emit('msgAlert',data); //broadcast 동일하게 가능 자신 제외 룸안의 유저
         // io.of('namespace').in(room_id).emit('msgAlert', data) //of 지정된 name space의 유저의 룸
@@ -97,7 +111,7 @@ db_init.init(function (err) {
     if (err) {
         console.log(err);
     } else {
-        server.listen(port, function(){
+        server.listen(port, function () {
             console.log('Server running at : ' + port);
         });
     }

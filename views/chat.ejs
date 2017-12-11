@@ -5,14 +5,22 @@
 
 <body>
 
-<div>
+<div class="container">
+    <h5><%= userid %></h5>
+    <br><br>
     <h5><%= userName %></h5>
     <br><br>
     <h5><%= major %></h5>
     <br><br>
-    <h5><%= degree %></h5>
+    <h5><%= degree %> 학년</h5>
+    <h5 id="broadcast"></h5>
+    <h5 id="roominfo"></h5>
+    <h5 id="length"></h5>
+    <h5 id="members"></h5>
+    <h5 id="classes"></h5>
+
 </div>
-<div class="container" style="margin-top: 20%">
+<div class="container" style="margin-top: 10%">
 
     <div class="row">
         <ul id="messages"></ul>
@@ -27,15 +35,29 @@
 </body>
 
 <script>
-    var roomName = "test_room";
+    var username = '<%= userName %>';
+    var userID = '<%= userid %>'
+    var roomName = "";
+    if (username == '오영택' || username == '조주영') {
+        roomName = 'test1'
+    } else {
+        roomName = 'test2'
+    }
     var socket = io.connect(window.location.origin);
 
     $(function () {
         $("#m").focus();
         socket.emit('joinRoom', roomName);
-        socket.on('msgAlert', function (msg, room_id) {
+        socket.on('msgAlert', function (msg) {
             $('#messages').append($('<li>').text(msg));
         });
+
+        socket.on('heartbeat', function (msg, room_id, roomlength, roommemberlist) {
+            $('#broadcast').html("공지 : " + msg)
+            $('#roominfo').html("이 방은 " + room_id + " 입니다")
+            $('#members').html("이 방의 멤버들은 " + roommemberlist + " 입니다")
+            $('#length').html("이 방의 멤버숫자는  " + roomlength + " 입니다")
+        })
 
         $('#messageForm').submit(function () {
             if ($('#m').val() != '') {
@@ -45,6 +67,19 @@
             return false;
         });
 
+//        $.ajax({
+//            url: '/class/getlist',
+//            type: 'POST',
+//            data: {userID: userID},
+//            success: function (result) {
+//                for (var i = 0; i < result.length; i++) {
+////                    $("#s" + i + "").html(result[i].TITLE);
+////                    $("#s" + i + "").attr("target", "_blank");
+////                    $("#s" + i + "").attr("href", result[i].LINK);
+//                    $('#classes').append($('<li>').text(result[i].));
+//                }
+//            }
+//        });
     });
 
 
