@@ -11,7 +11,7 @@ if (!jinst.isJvmCreated()) {
     //jinst.setupClasspath(['./drivers/tibero6-jdbc.jar']);
 
     console.log("driver connection complete");
-    jinst.setupClasspath(['./drivers/ojdbc7.jar']);
+    //jinst.setupClasspath(['./drivers/ojdbc7.jar']);
 }
 
 var db = new JDBC(require('./db_config.json'));

@@ -1,0 +1,31 @@
+<% include header.ejs %>
+
+<link href="/stylesheets/style.css" rel="stylesheet"></link>
+<script src="/javascripts/socket.io.js"></script>
+
+<body>
+<div>
+    <%
+    for(var i = 0; i < _class.length; i++)
+    {
+    %>
+    <div>
+        <button type="button" class="btn btn-danger" onclick="moveToCLASSPAGE(<%=_class[i].CLASSID%>)"><%=_class[i].CLASSNAME%></button>
+    </div>
+    <%
+    }
+    %>
+
+
+
+</div>
+
+</body>
+
+
+
+<script type="text/javascript">
+    function moveToCLASSPAGE(i) {
+        //location.href = "/class/?cid="+i;
+    }
+</script>
