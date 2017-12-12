@@ -417,19 +417,38 @@ module.exports.getBoardList = function (data, callback) {
                             } else {
                                 console.log('Get list query : ', query);
                                 resultset.toObjArray(function (err, results) {
-                                    db_init.release(connObj, function (err) {
-                                        var newdata = {
-                                            title: "전체게시판",
-                                            results: results,
-                                            page: data.page,
-                                            pageSize: pageSize,
-                                            startPage: startPage,
-                                            endPage: endPage,
-                                            totalPage: totalPage
-                                        };
-                                        callback(newdata);
-                                    });
+                                    var newdata = {
+                                        title: "전체게시판",
+                                        results: results,
+                                        page: data.page,
+                                        pageSize: pageSize,
+                                        startPage: startPage,
+                                        endPage: endPage,
+                                        totalPage: totalPage
+                                    };
+                                    query = "SELECT BOARDID FROM BOARD WHERE GROUPID=" + data.groupid;
+                                    console.log(query);
+                                    statement.executeQuery(query, function (err, resultset) {
+                                        if (err) {
+                                            console.log(err);
+                                            console.log("Error before executeQuery");
+                                            db_init.release(connObj, function () {
+                                            });
+                                            callback(false);
+                                        } else {
+                                            resultset.toObjArray(function (err, results2) {
 
+                                                db_init.release(connObj, function (err) {
+                                                    newdata.boardid = results2[0].BOARDID;
+                                                    // console.log(results2)
+                                                    // console.log(results2[0])
+                                                    console.log(results2)
+                                                    callback(newdata);
+
+                                                });
+                                            })
+                                        }
+                                    })
                                 });
                             }
                         });
@@ -706,7 +725,7 @@ module.exports.writepost = function (data, callback) {
                             console.log(err);
                             callback(err);
                         } else {
-                            callback(null, count);
+                            callback(count);
                         }
                     });
             }
