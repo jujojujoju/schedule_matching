@@ -25,6 +25,7 @@ router.get('/', isLogin, function (req, res, next) {
         else {
             console.log("get message list complete");
             data.receivedmessages = receivedmessages;
+            // data.contents
             data.flag = 1;
             db_.getMessages(data, function (sendedmessages) {
                 console.log(sendedmessages);

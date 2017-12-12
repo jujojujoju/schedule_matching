@@ -447,7 +447,8 @@ module.exports.getBoardList = function (data, callback) {
                         }
 
                         var query = "SELECT * FROM " +
-                            "(SELECT bb.boardid bid, pp.postid pid, pp.title pti, pp.content pco, pp.writer pw, pp.time pt " +
+                            "(SELECT bb.boardid bid, bb.groupid gid, bb.classid cid, pp.postid pid, " +
+                            "pp.title pti, pp.content pco, pp.writer pw, pp.time pt " +
                             "FROM board bb JOIN posts pp " +
                             "ON bb.boardid = pp.boardid " +
                             "WHERE bb.groupid = " + data.groupid + " ORDER BY bid DESC) " +
