@@ -32,7 +32,10 @@ router.get('/', isLogin, function (req, res, next) {
 
 router.post('/add', isLogin, function (req, res, next) {
     var obj = req.body;
-    console.log(obj);
+    console.log(obj)
+    // var last = {
+    //     id : obj.id
+    // };
     res.statusCode = 200;
     db_.addEvent(obj,req.session.info.userid,function(count){
         console.log("add event success");
@@ -54,14 +57,15 @@ router.post('/remove', isLogin, function (req, res, next) {
 
 router.post('/update', isLogin, function (req, res, next) {
     console.log("/update 들어옴!!!");
-
     var id = req.body.id;
     var title = req.body.title;
     console.log(id,title);
+
+
     res.statusCode = 200;
     db_.updateEvent(id,title,function(count){
         console.log("update event success");
-        res.send({});
+        res.send();
     });
 
 });

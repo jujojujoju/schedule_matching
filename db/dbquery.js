@@ -275,7 +275,7 @@ module.exports.addEvent = function (event_info,user_id, callback) {
             } else {
                 var s = "INSERT INTO EVENTS VALUES(EVENT_SEQ.nextval,'"+
                     event_info.title+"',TO_DATE('"+event_info.start+"'),"+
-                    "TO_DATE('"+event_info.end+"'),\'asd\',\'red\',\'P\',"+user_id+")";
+                    "TO_DATE('"+event_info.end+"')+1,\'asd\',\'red\',\'P\',"+user_id+")";
                 console.log(s);
                 statement.executeUpdate(s,
                     function (err, count) {
@@ -284,6 +284,7 @@ module.exports.addEvent = function (event_info,user_id, callback) {
                             callback(err);
                         } else {
                             console.log("쿼리실행후 에러 안남");
+                            console.log("카ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ운트 : ",count);
                             callback(count);
                         }
                     });

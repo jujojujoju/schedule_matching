@@ -9,17 +9,9 @@
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <li>캘린더나왔다능!</li>
 <script>
-    var lt = '<%= list[0].title %>'
-    var ls = '<%= list[0].start %>'
-    var le = '<%= list[0].end %>'
-    var lc = '<%= list[0].backgroundColor %>'
-    var la = '<%= list[0].allDay %>'
     var ls = <%- JSON.stringify(list) %>;
     <!--console.log(lt)-->
-    console.log(ls);
     <!--console.log(le)-->
-    <!--console.log('<%= list[0].start %>')-->
-    <!--console.log('<%= list[0].end %>')-->
 
     $(document).ready(function () {
         $('#calendar').fullCalendar({
@@ -30,10 +22,6 @@
             },
             events: ls,
             editable: true,
-//            eventDrop: function(event, delta, revertFunc) {
-//                alert(event.title + " was dropped on " + event.start.format());
-//
-//            },
             dayClick: function (start,allDay, jsEvent, view) {
                 var abc = prompt('Enter Title');
 //                var allDay = !start.hasTime && !end.hasTime;
@@ -98,15 +86,15 @@
                     $("#endTime").html(moment(event.end).format('MMM Do h:mm A'));
                     }
 
-                    $("#eventContent").dialog({ modal: true, title: event.title, width:400,
+                    $("#eventContent").dialog({ modal: true, title: event.title, id:event.id, width:400,
                     buttons:[{
                         text : "update",
                         icon: "ui-icon-heart",
-                        click: function() {
+                        click: function(event_title,event_id) {
                             //alert("update 누름");
                             var abc = prompt('Enter Title');
-                            console.log(event.id);
-                            console.log(abc);
+                            console.log(event_title,event_id);
+                            //console.log(abc);
                             event.title = abc;
                             updateEvent(event, function(success) {
                                 console.log("updateEvent(HTML) 들어옴");
