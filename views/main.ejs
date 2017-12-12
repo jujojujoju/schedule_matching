@@ -7,11 +7,11 @@
 
 <div class="container">
     <div>
-        <h1><%= userName %></h1>
+        <h1><%= session.userName %></h1>
         <br><br>
-        <h1><%= major %></h1>
+        <h1><%= session.major %></h1>
         <br><br>
-        <h1><%= degree %></h1>
+        <h1><%= session.degree %></h1>
         <br><br>
     </div>
     <form>
@@ -21,14 +21,18 @@
         <tr>
             <th>번호</th>
             <th>그룹이름</th>
+            <th>방장이름</th>
+            <th>생성날짜</th>
         </tr>
         <%
-        for(var i = 1; i < 4; i++)
+        for(var i = 0; i < results.length; i++)
         {
         %>
         <tr>
-            <td><%= i %></td>
-            <td><a onclick="moveToChat(<%= i %>)"><%= i %></a></td>
+            <td><%= i + 1 %></td>
+            <td><a onclick="moveToChat('<%= results[i].GROUPID %>', '<%= results[i].GROUPNAME %>')"><%= results[i].GROUPNAME %></a></td>
+            <td><%= results[i].NAME %></td>
+            <td><%= results[i].CREATEDATE %></td>
         </tr>
         <%
         }
@@ -39,6 +43,9 @@
         <button type="button" class="btn btn-danger" onclick="createGroup()">그룹페이지 생성</button>
         <button type="button" class="btn btn-danger" onclick="moveToClass()">수업페이지 이동</button>
         <button type="button" class="btn btn-danger" onclick="moveToCalendar()">달력페이지 이동</button>
+        <button type="button" class="btn btn-danger" onclick="moveToMessages()">쪽지함으로 이동</button>
+        <button type="button" class="btn btn-danger" onclick="moveToBoard()">게시판</button>
+
     </div>
 
 </div>
@@ -46,8 +53,8 @@
 </body>
 
 <script type="text/javascript">
-    function moveToChat(id) {
-        location.href = "/group/?id=" + id;
+    function moveToChat(id, name) {
+        location.href = "/group/?id=" + id + "&name=" + name;
     }
     function logout() {
         location.href = "/logout";
@@ -56,15 +63,23 @@
         location.href = "/class";
     }
     function createGroup() {
-        var newid = prompt("그룹 이름 입력");
-        if (newid != null) {
+        var groupname = prompt("그룹 이름 입력");
+        if (groupname != null) {
             console.log("그룹생성완료")
-            location.href = "/group/create/?id=" + newid;
+            location.href = "/group/create/?name=" + groupname;
         }
     }
+
     function moveToCalendar() {
         alert("달력페이지로 갑시다!");
         location.href = "/calendar";
+}
+    function moveToMessages() {
+        location.href = "/messages"
+    }
+    function moveToBoard() {
+        location.href = '/board'
+
     }
 </script>
 

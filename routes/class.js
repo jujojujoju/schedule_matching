@@ -11,6 +11,7 @@ function isLogin(req, res, next) {
         res.redirect("/");
     }
 }
+
 router.get('/', isLogin, function (req, res, next) {
     var data;
     db_.getClassList_distinct(req.session.info.userid,function(results){
@@ -18,7 +19,6 @@ router.get('/', isLogin, function (req, res, next) {
             console.log(results[i].CLASSID + "   "+results[i].CLASSNAME);
         }
         console.log(results.length);
-        var a = results.length;
         data= {
             _class : results
         };
@@ -68,8 +68,6 @@ router.post('/getsch', function (req, res, next) {
         res.send(results);
     });
 });
-
-
 
 
 module.exports = router;

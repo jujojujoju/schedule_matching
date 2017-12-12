@@ -6,7 +6,14 @@ var url = require("url");
 var db_init = require('../db/db_init');
 var db_ = require("../db/dbquery");
 
+function noCache(res) {
+    res.header("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.header("Pragma", "no-cache");
+    res.header("Expires", 0);
+}
+
 function isLogin(req, res, next) {
+    noCache(res);
     if (req.session.info != undefined) {
         next();
     } else {
@@ -15,6 +22,8 @@ function isLogin(req, res, next) {
 }
 
 function isNotLogin(req, res, next) {
+    noCache(res);
+    console.log(req.session.info, req.session.info == undefined);
     if (req.session.info == undefined) {
         next();
     } else {
@@ -39,7 +48,21 @@ router.get('/', isNotLogin, function (req, res, next) {
 });
 
 router.get('/main', isLogin, function (req, res, next) {
-    res.render('main', req.session.info);
+    var data = {
+        results: null,
+        session: req.session.info
+    };
+    db_.getGroupList(function (results) {
+        console.log(results);
+        if (results == undefined || results == null) {
+            console.log("result is undefined")
+        }
+        else {
+            console.log("get group list complete");
+            data.results = results;
+            res.render('main', data);
+        }
+    });
     // res.render('weekTest');
     // res.render('calendarTest');
 });
@@ -185,11 +208,7 @@ router.post('/login', isNotLogin, function (req, res, next) {
     ;
 });
 
-/*
- router.get('/class/:classid', isLogin, function (req, res, next) {
- var params = url.parse(req.url, true).query;
- }
- */
+
 
 
 module.exports = router;

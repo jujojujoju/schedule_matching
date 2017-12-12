@@ -6,61 +6,67 @@
 <body>
 
 <div class="container">
-    <h5><%= session.userid %></h5>
-    <br><br>
-    <h5><%= session.userName %></h5>
-    <br><br>
-    <h5><%= session.major %></h5>
-    <br><br>
-    <h5><%= session.degree %> 학년</h5>
-    <h5 id="broadcast"></h5>
-    <h5 id="roominfo"></h5>
-    <h5 id="length"></h5>
-    <h5 id="members"></h5>
-    <ul id="classes"></ul>
+    <div class="row">
+        <div class="col-xs-8 text-center">
+            <h5><%= session.userid %></h5>
+            <h5><%= session.userName %></h5>
+            <h5><%= session.major %></h5>
+            <h5><%= session.degree %> 학년</h5>
+
+            <h5 id="broadcast"></h5>
+            <h5 id="roominfo"></h5>
+            <h5 id="length"></h5>
+            <h5 id="members"></h5>
+            <ul id="classes"></ul>
+        </div>
+        <div class="col-xs-4">
+            <div class="row">
+                <div class="chat_contents">
+                    <ul id="messages"></ul>
+                </div>
+                <form id="messageForm" action="">
+                    <input style=" padding: 10px; width: 80%;" id="m" autocomplete="off"/>
+                    <button onclick="entering()" class="btn btn-default" style="padding: 10px; width: 18%;">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
 </div>
 <button type="button" class="btn btn-danger" onclick="getClassList()">이방에 속한 모든사람 수업 가져오기</button>
-<div class="container" style="margin-top: 10%">
 
-    <div class="row">
-        <ul id="messages"></ul>
-        <form id="messageForm" action="">
-            <input style=" padding: 10px; width: 80%;" id="m" autocomplete="off"/>
-            <button class="btn btn-default" style="padding: 10px; width: 18%;">Send</button>
-        </form>
-    </div>
-
-</div>
 
 </body>
 
 <script>
+    function entering() {
+        $(".chat_contents").scrollTop($(".chat_contents")[0].scrollHeight);
+    }
     var username = '<%= session.userName %>';
     var userID = '<%= session.userid %>';
-    var roomName = '<%= chatid %>';
-//    if (username == '오영택' || username == '조주영') {
-//        roomName = 'test1'
-//    } else {
-//        roomName = 'test2'
-//    }
+    var roomID = '<%= groupid %>';
+    var roomname = '<%= groupname %>';
+    //    if (username == '오영택' || username == '조주영') {
+    //        roomName = 'test1'
+    //    } else {
+    //        roomName = 'test2'
+    //    }
     var socket = io.connect(window.location.origin);
     var users = []
     $(function () {
         $("#m").focus();
-        socket.emit('joinRoom', roomName);
+        socket.emit('joinRoom', roomID);
         socket.on('msgAlert', function (msg) {
             $('#messages').append($('<li>').text(msg));
         });
-
         socket.on('heartbeat', function (msg, room_id, roomlength, roommemberlist, roomidlist) {
             $('#broadcast').html("공지 : " + msg)
-            $('#roominfo').html("이 방은 " + room_id + " 입니다")
+            $('#roominfo').html("이 방의 아이디는 " + room_id + "이고 이름은" + roomname + " 입니다")
             users = roomidlist;
             $('#members').html("이 방의 멤버들은 " + roommemberlist + " 입니다")
             $('#length').html("이 방의 멤버숫자는  " + roomlength + " 입니다")
-        })
-
+        });
         $('#messageForm').submit(function () {
             if ($('#m').val() != '') {
                 socket.emit('sendMsg', $('#m').val());
@@ -68,7 +74,6 @@
             }
             return false;
         });
-
     });
     function getClassList() {
         for (var i = 0; i < users.length; i++) {
@@ -83,12 +88,8 @@
                     }
                 }
             });
-
         }
-
     }
-
-
 </script>
 
 

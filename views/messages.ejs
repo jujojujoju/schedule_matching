@@ -1,0 +1,112 @@
+<% include header.ejs %>
+
+<style>
+    .messageform {
+        position: fixed;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+</style>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-8">
+            <!--<div  style="width: 50%; margin-left: 10%;">-->
+            <div class="row">
+                <table class="table table-bordered table-hover">
+                    받은 메세지
+                    <tr>
+                        <th>번호</th>
+                        <th>보낸 이</th>
+                        <!--<th>받는 이</th>-->
+                        <th>보낸날짜</th>
+                    </tr>
+                    <%
+                    for(var i = 0; i < receivedmessages.length; i++)
+                    {
+                    %>
+                    <tr>
+                        <td><%= i + 1 %></td>
+                        <td>
+                            <a onclick="resendMessage('<%= receivedmessages[i].SENDERID %>')"><%= receivedmessages[i].SENDERID %></a>
+                        </td>
+                        <td><%= receivedmessages[i].SENDTIME %></td>
+                    </tr>
+                    <%
+                    }
+                    %>
+                </table>
+            </div>
+            <!--</div>-->
+            <div class="row">
+                <table class="table table-bordered table-hover">
+                    보낸 메세지
+                    <tr>
+                        <th>번호</th>
+                        <!--<th>보낸 이</th>-->
+                        <th>받는 이</th>
+                        <th>보낸날짜</th>
+                    </tr>
+                    <%
+                    for(var i = 0; i < sendedmessages.length; i++)
+                    {
+                    %>
+                    <tr>
+                        <td><%= i + 1 %></td>
+                        <td>
+                            <a onclick="resendMessage('<%= sendedmessages[i].RECEIVERID %>')"><%= sendedmessages[i].RECEIVERID %></a>
+                        </td>
+                        <td><%= sendedmessages[i].SENDTIME %></td>
+                    </tr>
+                    <%
+                    }
+                    %>
+                </table>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <form class="messageform" method="post" action="/messages/send">
+                <div class="form-group">
+                    <label>받을 사람</label>
+                    <input type="text" class="form-control" id="receiverid" name="receiverid" placeholder="To...">
+                </div>
+                <div class="form-group">
+                    <label>내용</label>
+                    <textarea rows="10" cols="50" class="form-control" id="contents" name="contents"
+                              placeholder="Contents"></textarea>
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript">
+    function resendMessage(id) {
+        $("#receiverid").focus();
+        $("#receiverid").val(id);
+        $("#contents").val('');
+
+//        var groupname = prompt("메세지 내용입력");
+//        if (groupname != null) {
+//            console.log("메세지완료")
+//            location.href = "/group/create/?name=" + groupname;
+//        }
+
+//        $.ajax({
+//            url: '/class/getsch',
+//            type: 'POST',
+//            data: {userIDs: users[i]},
+//            success: function (result) {
+//                for (var i = 0; i < result.length; i++) {
+//                    $('#classes').append($('<li>').text(result[i].CLASSID + result[i].CLASSNAME));
+//                    console.log("" + result[i].CLASSID + "" + result[i].CLASSNAME)
+//                }
+//            }
+//        });
+    }
+</script>
+
+</html>
