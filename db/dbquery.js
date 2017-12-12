@@ -51,7 +51,7 @@ module.exports.signup = function (input, callback) {
                             //교수이름으로 count하며 for loop
                             // 6번
                             var count1 = 0;
-                            var key = "";
+                            var professor = "";
                             var prof_name = Object.keys(input.classinfo.prof_time)
                             async.whilst(
                                 function () {
@@ -59,62 +59,67 @@ module.exports.signup = function (input, callback) {
                                     return (count1 < prof_name.length)
                                 },
                                 function (c1) {
-                                    key = prof_name[count1]
+                                    professor = prof_name[count1];
                                     var count2 = 0;
-                                    async.whilst(
-                                        function () {
-                                            return count2 < input.classinfo.prof_time[key].length
-                                        },
-                                        function (c2) {
-                                            // query = "INSERT INTO CLASS VALUES ('"
-                                            //     + input.classinfo.classid[count1] + "','"
-                                            //     + input.classinfo.classname[count1] + "','"
-                                            //     + key + "','"
-                                            //     + input.classinfo.prof_time[key][count2].day + "','"
-                                            //     + input.classinfo.prof_time[key][count2].starttime + "','"
-                                            //     + input.classinfo.prof_time[key][count2].endtime + "','"
-                                            //     + input.classinfo.prof_time[key][count2].loc + "')";
-                                            query = "INSERT INTO CLASS ( classid ,classname, profname, day, starttime, endtime, classloc) SELECT '"
-                                                + input.classinfo.classid[count1] + "','"
-                                                + input.classinfo.classname[count1] + "','"
-                                                + key + "','"
-                                                + input.classinfo.prof_time[key][count2].day + "','"
-                                                + input.classinfo.prof_time[key][count2].starttime + "','"
-                                                + input.classinfo.prof_time[key][count2].endtime + "','"
-                                                + input.classinfo.prof_time[key][count2].loc + "' " +
-                                                "from dual where not exists " +
-                                                "(select * from CLASS where classid= '"
-                                                + input.classinfo.classid[count1] + "' and day= '" + input.classinfo.prof_time[key][count2].day + "' )"
-                                            console.log(query);
-                                            statement.executeUpdate(query,
-                                                function (err, c3) {
-                                                    if (err) {
-                                                        console.log(err);
-                                                    } else {
-                                                        query = "INSERT INTO USER_CLASS VALUES ("
-                                                            + input.userinfo.userid + ",'"
-                                                            + input.classinfo.classid[count1] + "','"
-                                                            + input.classinfo.prof_time[key][count2].day + "')";
+                                    query = "INSERT INTO CLASS (classid, classname, profname) SELECT '"
+                                        + input.classinfo.classid[count1] + "','"
+                                        + input.classinfo.classname[count1] + "','"
+                                        + professor
+                                        + "' from dual where not exists " +
+                                        "(select * from CLASS where classid= '"
+                                        + input.classinfo.classid[count1] + "')";
+                                    statement.executeUpdate(query,
+                                        function (err, c6) {
+                                            if (err) {
+                                                console.log(err);
+                                            } else {
+                                                async.whilst(
+                                                    function () {
+                                                        return count2 < input.classinfo.prof_time[professor].length
+                                                    },
+                                                    function (c2) {
+                                                        query = "INSERT INTO CLASS_TIME SELECT class_time_seq.nextval, '" + input.classinfo.classid[count1] + "', '"
+                                                            + input.classinfo.prof_time[professor][count2].day + "','"
+                                                            + input.classinfo.prof_time[professor][count2].starttime + "','"
+                                                            + input.classinfo.prof_time[professor][count2].endtime + "','"
+                                                            + input.classinfo.prof_time[professor][count2].loc + "' "
+                                                            + "from dual where not exists "
+                                                            + "(select * from CLASS_TIME where classid= '"
+                                                            + input.classinfo.classid[count1] + "' and day= '" + input.classinfo.prof_time[professor][count2].day + "' )"
+                                                        console.log(query);
                                                         statement.executeUpdate(query,
-                                                            function (err, c4) {
+                                                            function (err, c3) {
                                                                 if (err) {
-                                                                    console.log(err)
+                                                                    console.log(err);
                                                                 } else {
-                                                                    console.log("insert complete");
-                                                                    count2++;
-                                                                    setTimeout(c2, 0);
+                                                                    query = "INSERT INTO USER_CLASS SELECT "
+                                                                        + input.userinfo.userid + ",'"
+                                                                        + input.classinfo.classid[count1]
+                                                                        + "' from dual where not exists (select * from USER_CLASS where userid="
+                                                                        + input.userinfo.userid + " " +
+                                                                        "and classid='" + input.classinfo.classid[count1] + "')";
+                                                                    statement.executeUpdate(query,
+                                                                        function (err, c4) {
+                                                                            if (err) {
+                                                                                console.log(err)
+                                                                            } else {
+                                                                                console.log("insert complete");
+                                                                                count2++;
+                                                                                setTimeout(c2, 0);
+                                                                            }
+                                                                        }
+                                                                    );
                                                                 }
                                                             }
                                                         );
+                                                    },
+                                                    function (err) {
+                                                        count1++;
+                                                        c1();
                                                     }
-                                                }
-                                            );
-                                        },
-                                        function (err) {
-                                            count1++;
-                                            c1();
-                                        }
-                                    );
+                                                );
+                                            }
+                                        })
                                 },
                                 function (err) {
                                     db_init.release(connObj, function (err) {
@@ -125,7 +130,8 @@ module.exports.signup = function (input, callback) {
                             );
 
                         }
-                    });
+                    }
+                );
             }
         });
     })
@@ -296,9 +302,27 @@ module.exports.createGroup = function (data, callback) {
                                     callback(false);
                                 } else {
                                     resultset.toObjArray(function (err, results) {
-                                        db_init.release(connObj, function (err) {
-                                            callback(results);
-                                        });
+                                        if (err) {
+                                            console.log(err);
+                                            db_init.release(connObj, function () {
+                                            });
+                                            callback(false);
+                                        } else {
+                                            console.log(results[0].GROUPID);
+                                            query = "INSERT INTO BOARD (BOARDID, GROUPID) " +
+                                                "VALUES (board_seq.nextval, " + results[0].GROUPID + ")";
+                                            statement.executeUpdate(query,
+                                                function (err, count) {
+                                                    if (err) {
+                                                        callback(err);
+                                                    } else {
+                                                        db_init.release(connObj, function (err) {
+                                                            callback(results);
+                                                        });
+                                                    }
+                                                })
+                                        }
+
                                     });
                                 }
                             });
@@ -307,7 +331,8 @@ module.exports.createGroup = function (data, callback) {
                     });
             }
         });
-    });
+    })
+    ;
 
 };
 
@@ -339,7 +364,7 @@ module.exports.getMessages = function (data, callback) {
                                 });
                             }
                         });
-                }else{
+                } else {
                     query = "SELECT * FROM MESSAGES WHERE SENDERID=" + data.id;
                     console.log(query);
                     statement.executeQuery(query,
@@ -391,3 +416,74 @@ module.exports.sendMessage = function (data, callback) {
     });
 };
 
+module.exports.getBoardList = function (data, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                console.log("ERR[before query]");
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var sql = "select count(*) cnt from board";
+                statement.executeQuery(sql, function (err, resultset) {
+
+                    var size = 10;  // 한 페이지에 보여줄 개수
+                    var begin = (data.page - 1) * size + 1; // 시작 글
+                    var end = data.page * size;
+
+                    resultset.toObjArray(function (err, results) {
+                        var totalCount = Number(results[0].CNT); // 크롤링 해온 전체 글의 갯수
+
+                        var totalPage = Math.ceil(totalCount / size);  // 전체 페이지의 수 (116 / 10 = 12..)
+                        var pageSize = 10; // 페이지 링크의 개수, 10개씩 보여주고 10개씩 넘어감
+
+                        // 1~10페이지는 1로, 11~20페이지는 11로 --> 숫자 첫째자리수를 1로 고정
+                        var startPage = Math.floor((data.page - 1) / pageSize) * pageSize + 1;
+                        var endPage = startPage + (pageSize - 1);
+
+                        if (endPage > totalPage) {
+                            endPage = totalPage;
+                        }
+
+                        var query = "SELECT * FROM " +
+                            "(SELECT bb.boardid bid, pp.postid pid, pp.title pti, pp.content pco, pp.writer pw, pp.time pt " +
+                            "FROM board bb JOIN posts pp " +
+                            "ON bb.boardid = pp.boardid " +
+                            "WHERE bb.groupid = " + data.groupid + " ORDER BY bid DESC) " +
+                            "WHERE ROWNUM BETWEEN " + begin + " AND " + end;
+                        statement.executeQuery(query, function (err, resultset) {
+                            if (err) {
+                                console.log(err);
+                                console.log("Error before executeQuery");
+                                db_init.release(connObj, function () {
+                                });
+                                callback(false);
+                            } else {
+                                console.log('Get list query : ', query);
+                                resultset.toObjArray(function (err, results) {
+                                    db_init.release(connObj, function (err) {
+                                        var newdata = {
+                                            title: "전체게시판",
+                                            results: results,
+                                            page: data.page,
+                                            pageSize: pageSize,
+                                            startPage: startPage,
+                                            endPage: endPage,
+                                            totalPage: totalPage
+                                        };
+                                        callback(newdata);
+                                    });
+
+                                });
+                            }
+                        });
+                    });
+
+                });
+
+            }
+        });
+    });
+};

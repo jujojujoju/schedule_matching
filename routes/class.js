@@ -11,6 +11,7 @@ function isLogin(req, res, next) {
         res.redirect("/");
     }
 }
+
 router.get('/', isLogin, function (req, res, next) {
     var data;
     db_.getClassList_distinct(req.session.info.userid,function(results){

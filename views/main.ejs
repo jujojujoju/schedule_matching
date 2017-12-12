@@ -43,6 +43,7 @@
         <button type="button" class="btn btn-danger" onclick="createGroup()">그룹페이지 생성</button>
         <button type="button" class="btn btn-danger" onclick="moveToClass()">수업페이지 이동</button>
         <button type="button" class="btn btn-danger" onclick="moveToMessages()">쪽지함으로 이동</button>
+        <button type="button" class="btn btn-danger" onclick="moveToBoard()">게시판</button>
     </div>
 
 </div>
@@ -68,6 +69,9 @@
     }
     function moveToMessages() {
         location.href = "/messages"
+    }
+    function moveToBoard() {
+        location.href = '/board'
     }
 </script>
 
