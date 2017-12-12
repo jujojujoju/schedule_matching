@@ -11,6 +11,9 @@
 <script>
     var ls = <%- JSON.stringify(list) %>;
 
+    <!--console.log(lt)-->
+    <!--console.log(le)-->
+
     $(document).ready(function () {
         $('#calendar').fullCalendar({
             header: {
@@ -82,15 +85,18 @@
                     else{
                     $("#endTime").html(moment(event.end).format('MMM Do h:mm A'));
                     }
-                    $("#eventContent").dialog({ modal: true, title: event.title, id: event.id, width:400,
+
+
+                    $("#eventContent").dialog({ modal: true, title: event.title, id:event.id, width:400,
                     buttons:[{
                         text : "update",
                         icon: "ui-icon-heart",
-                        click: function(event_id,event_title) {
+                        click: function(event_title,event_id) {
+
                             //alert("update 누름");
                             var abc = prompt('Enter Title');
-                            console.log(event.id);
-                            console.log(abc);
+                            console.log(event_title,event_id);
+                            //console.log(abc);
                             event.title = abc;
                             updateEvent(event, function(success) {
                                 console.log("updateEvent(HTML) 들어옴");
