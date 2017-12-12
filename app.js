@@ -19,9 +19,13 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var classes = require('./routes/class');
 var group = require('./routes/group');
-var calendar = require('./routes/calendar');
-var app = express();
 
+var calendar = require('./routes/calendar');
+
+var message = require('./routes/message');
+var board = require('./routes/board');
+
+var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,7 +50,12 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/class', classes);
 app.use('/group', group);
+
 app.use('/calendar',calendar);
+
+app.use('/board', board);
+app.use('/messages', message);
+
 var port = 9898;
 app.set('port', port);
 

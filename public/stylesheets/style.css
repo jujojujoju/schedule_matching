@@ -1,10 +1,14 @@
 
+
+.chat_contents {
+    height: 400px;
+    overflow: auto;
+    position: relative
+}
+
 form {
     padding: 10px;
-    position: fixed;
     bottom: 0;
-    width: 50%;
-    margin: 30px 15%
 }
 
 #messages {

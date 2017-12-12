@@ -51,7 +51,7 @@ module.exports.signup = function (input, callback) {
                             //교수이름으로 count하며 for loop
                             // 6번
                             var count1 = 0;
-                            var key = "";
+                            var professor = "";
                             var prof_name = Object.keys(input.classinfo.prof_time)
                             async.whilst(
                                 function () {
@@ -59,62 +59,67 @@ module.exports.signup = function (input, callback) {
                                     return (count1 < prof_name.length)
                                 },
                                 function (c1) {
-                                    key = prof_name[count1]
+                                    professor = prof_name[count1];
                                     var count2 = 0;
-                                    async.whilst(
-                                        function () {
-                                            return count2 < input.classinfo.prof_time[key].length
-                                        },
-                                        function (c2) {
-                                            // query = "INSERT INTO CLASS VALUES ('"
-                                            //     + input.classinfo.classid[count1] + "','"
-                                            //     + input.classinfo.classname[count1] + "','"
-                                            //     + key + "','"
-                                            //     + input.classinfo.prof_time[key][count2].day + "','"
-                                            //     + input.classinfo.prof_time[key][count2].starttime + "','"
-                                            //     + input.classinfo.prof_time[key][count2].endtime + "','"
-                                            //     + input.classinfo.prof_time[key][count2].loc + "')";
-                                            query = "INSERT INTO CLASS ( classid ,classname, profname, day, starttime, endtime, classloc) SELECT '"
-                                                + input.classinfo.classid[count1] + "','"
-                                                + input.classinfo.classname[count1] + "','"
-                                                + key + "','"
-                                                + input.classinfo.prof_time[key][count2].day + "','"
-                                                + input.classinfo.prof_time[key][count2].starttime + "','"
-                                                + input.classinfo.prof_time[key][count2].endtime + "','"
-                                                + input.classinfo.prof_time[key][count2].loc + "' " +
-                                                "from dual where not exists " +
-                                                "(select * from CLASS where classid= '"
-                                                + input.classinfo.classid[count1] + "' and day= '" + input.classinfo.prof_time[key][count2].day +"' )"
-                                            console.log(query);
-                                            statement.executeUpdate(query,
-                                                function (err, c3) {
-                                                    if (err) {
-                                                        console.log(err);
-                                                    } else {
-                                                        query = "INSERT INTO USER_CLASS VALUES ("
-                                                            + input.userinfo.userid + ",'"
-                                                            + input.classinfo.classid[count1] + "','"
-                                                            + input.classinfo.prof_time[key][count2].day + "')";
+                                    query = "INSERT INTO CLASS (classid, classname, profname) SELECT '"
+                                        + input.classinfo.classid[count1] + "','"
+                                        + input.classinfo.classname[count1] + "','"
+                                        + professor
+                                        + "' from dual where not exists " +
+                                        "(select * from CLASS where classid= '"
+                                        + input.classinfo.classid[count1] + "')";
+                                    statement.executeUpdate(query,
+                                        function (err, c6) {
+                                            if (err) {
+                                                console.log(err);
+                                            } else {
+                                                async.whilst(
+                                                    function () {
+                                                        return count2 < input.classinfo.prof_time[professor].length
+                                                    },
+                                                    function (c2) {
+                                                        query = "INSERT INTO CLASS_TIME SELECT class_time_seq.nextval, '" + input.classinfo.classid[count1] + "', '"
+                                                            + input.classinfo.prof_time[professor][count2].day + "','"
+                                                            + input.classinfo.prof_time[professor][count2].starttime + "','"
+                                                            + input.classinfo.prof_time[professor][count2].endtime + "','"
+                                                            + input.classinfo.prof_time[professor][count2].loc + "' "
+                                                            + "from dual where not exists "
+                                                            + "(select * from CLASS_TIME where classid= '"
+                                                            + input.classinfo.classid[count1] + "' and day= '" + input.classinfo.prof_time[professor][count2].day + "' )"
+                                                        console.log(query);
                                                         statement.executeUpdate(query,
-                                                            function (err, c4) {
+                                                            function (err, c3) {
                                                                 if (err) {
-                                                                    console.log(err)
+                                                                    console.log(err);
                                                                 } else {
-                                                                    console.log("insert complete");
-                                                                    count2++;
-                                                                    setTimeout(c2, 0);
+                                                                    query = "INSERT INTO USER_CLASS SELECT "
+                                                                        + input.userinfo.userid + ",'"
+                                                                        + input.classinfo.classid[count1]
+                                                                        + "' from dual where not exists (select * from USER_CLASS where userid="
+                                                                        + input.userinfo.userid + " " +
+                                                                        "and classid='" + input.classinfo.classid[count1] + "')";
+                                                                    statement.executeUpdate(query,
+                                                                        function (err, c4) {
+                                                                            if (err) {
+                                                                                console.log(err)
+                                                                            } else {
+                                                                                console.log("insert complete");
+                                                                                count2++;
+                                                                                setTimeout(c2, 0);
+                                                                            }
+                                                                        }
+                                                                    );
                                                                 }
                                                             }
                                                         );
+                                                    },
+                                                    function (err) {
+                                                        count1++;
+                                                        c1();
                                                     }
-                                                }
-                                            );
-                                        },
-                                        function (err) {
-                                            count1++;
-                                            c1();
-                                        }
-                                    );
+                                                );
+                                            }
+                                        })
                                 },
                                 function (err) {
                                     db_init.release(connObj, function (err) {
@@ -125,7 +130,8 @@ module.exports.signup = function (input, callback) {
                             );
 
                         }
-                    });
+                    }
+                );
             }
         });
     })
@@ -144,7 +150,7 @@ module.exports.getClassList_distinct = function (ID, callback) {
             } else {
                 var query = "SELECT DISTINCT CLASSID, CLASSNAME\n" +
                     "FROM CLASS\n" +
-                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID+")";
+                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID + ")";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -177,7 +183,7 @@ module.exports.getClassList = function (ID, callback) {
             } else {
                 var query = "SELECT CLASSID, CLASSNAME\n" +
                     "FROM CLASS\n" +
-                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID+")";
+                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID + ")";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -208,40 +214,7 @@ module.exports.getClassInfo = function (CID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT * FROM CLASS WHERE CLASSID='" + CID+"' ORDER BY DAY DESC";
-                console.log(query);
-                statement.executeQuery(query,
-                    function (err, resultset) {
-                        if (err) {
-                            console.log(err);
-                            db_init.release(connObj, function () {
-                            });
-                            callback(false);
-                        } else {
-                            resultset.toObjArray(function (err, results) {
-                                db_init.release(connObj, function (err) {
-                                    callback(results);
-                                });
-                            });
-                        }
-                    });
-            }
-        });
-    });
-};
-
-module.exports.getCalendar = function (ID, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" "+
-                "FROM EVENTS " +
-                "WHERE PG_ID ="+ID;
+                var query = "SELECT * FROM CLASS WHERE CLASSID='" + CID + "' ORDER BY DAY DESC";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {

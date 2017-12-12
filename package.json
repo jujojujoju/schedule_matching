@@ -18,7 +18,6 @@
     "fullcalendar": "^3.7.0",
     "http": "0.0.0",
     "iconv": "^2.3.0",
-    "jade": "~1.11.0",
     "jdbc": "^0.6.1",
     "moment": "^2.19.2",
     "moment-timezone": "^0.5.14",
