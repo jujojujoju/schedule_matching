@@ -2,11 +2,25 @@
 <html lang="en">
 
 <link rel='stylesheet' href='/fullcalendar/dist/fullcalendar.css'/>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 <script src="/javascripts/jquery-3.1.0.min.js"></script>
 <script src='/moment/min/moment.min.js'></script>
 <script src='/fullcalendar/dist/fullcalendar.js'></script>
-
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<li>캘린더나왔다능!</li>
 <script>
+    var lt = '<%= list[0].title %>'
+    var ls = '<%= list[0].start %>'
+    var le = '<%= list[0].end %>'
+    var lc = '<%= list[0].backgroundColor %>'
+    var la = '<%= list[0].allDay %>'
+    var ls = <%- JSON.stringify(list) %>;
+    <!--console.log(lt)-->
+    console.log(ls);
+    <!--console.log(le)-->
+    <!--console.log('<%= list[0].start %>')-->
+    <!--console.log('<%= list[0].end %>')-->
+
     $(document).ready(function () {
         $('#calendar').fullCalendar({
             header: {
@@ -14,30 +28,241 @@
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
-            events: [
-                {
-                    title: 'My Event',
-                    start: '2017-11-15',
-                    description: 'This is a cool event',
-                    backgroundColor:'red'
-                }
-            ],
+            events: ls,
             editable: true,
 //            eventDrop: function(event, delta, revertFunc) {
 //                alert(event.title + " was dropped on " + event.start.format());
 //
 //            },
-            dayClick: function (start, end, jsEvent, view) {
+            dayClick: function (start,allDay, jsEvent, view) {
                 var abc = prompt('Enter Title');
 //                var allDay = !start.hasTime && !end.hasTime;
                 var newEvent = {};
                 newEvent.title = abc;
+                if(abc == ""){
+                    alert("공백은 입력이 안됩니다");
+                    return;
+                }
                 newEvent.start = moment(start).format();
-                newEvent.editable = true;
-                $('#calendar').fullCalendar('renderEvent', newEvent);
+                newEvent.end = moment(start).format();
+                newEvent.backgroundColor = 'red';
+                newEvent.allDay = true  ;
+                //newEvent.editable = true;
+
+                addEvent(newEvent, function(success) {
+                    if (success) $('#calendar').fullCalendar('renderEvent', newEvent);
+                    else {
+                        alert("실패");
+                    }
+                });
+            },
+            eventResize: function(event, delta, revertFunc) {
+                console.log("resize att!!!!!!!!!!!!! : ", event.end,delta);
+                alert(event.title + " end is now " + event.end.format());
+                var obj ={
+                    id : event.id,
+                    end : event.end._i,
+                    delta : delta._days
+                };
+
+                console.log("함수들어가기전 obj : ",obj);
+                if (!confirm("is this okay?")) {
+                    revertFunc();
+                }
+                else{
+                    resizeUpdateEvent(obj,function(success){
+                        console.log("resizeUpdateEvent 들어옴");
+                        if (success){
+                            $('#calendar').fullCalendar( 'updateEvent', event);
+                            $('#calendar').fullCalendar( 'refetchEvents');
+                            $('#calendar').fullCalendar('rerenderEvents');
+                        }
+                        else {
+                            alert("실패");
+                        }
+                    });
+                }
+
+            },
+            eventRender: function (event, element) {
+                element.attr('href', 'javascript:void(0);');
+                element.click(function() {
+//                    alert(event.end);
+//                    return ;
+                    console.log(event.start);
+                    $("#startTime").html(moment(event.start).format('MMM Do h:mm A'));
+                    if(event.end == null) {
+                        $("#endTime").html(moment(event.start).format('MMM Do h:mm A'));
+                    }
+                    else{
+                    $("#endTime").html(moment(event.end).format('MMM Do h:mm A'));
+                    }
+
+                    $("#eventContent").dialog({ modal: true, title: event.title, width:400,
+                    buttons:[{
+                        text : "update",
+                        icon: "ui-icon-heart",
+                        click: function() {
+                            //alert("update 누름");
+                            var abc = prompt('Enter Title');
+                            console.log(event.id);
+                            console.log(abc);
+                            event.title = abc;
+                            updateEvent(event, function(success) {
+                                console.log("updateEvent(HTML) 들어옴");
+                                if (success){
+                                    $('#calendar').fullCalendar( 'updateEvent', event);
+                                    $('#calendar').fullCalendar( 'refetchEvents');
+                                    $('#calendar').fullCalendar('rerenderEvents');
+                                }
+                                else {
+                                    alert("실패");
+                                }
+                            });
+                            $( this ).dialog( "close" );
+                       }},{
+                        text : "delete",
+                        icon: "ui-icon-heart",
+                        click: function() {
+                            //alert("delete 누름");
+                            removeEvent(event.id, function(success) {
+                                console.log("removeEvent 들어옴");
+                                if (success){
+                                    $('#calendar').fullCalendar('removeEvents',event.id);
+                                    $('#calendar').fullCalendar('addEventSource', event);
+                                    $('#calendar').fullCalendar('rerenderEvents' );
+                                }
+                                else {
+                                    alert("실패");
+                                }
+                            });
+                            $( this ).dialog( "close" );
+                        }
+                    },{
+                        text : "cancle",
+                        icon: "ui-icon-heart",
+                        click: function() {
+                            //alert("cancle 누름");
+                            $( this ).dialog( "close" );
+                        }
+                    }]});
+                });
+
+            },
+            eventDrop: function(event, delta, revertFunc) {
+                console.log("id : "+event.id);
+                console.log("start : "+event.start);
+                console.log("delta : "+ delta/86400000);
+                var obj = {
+                    id : event.id,
+                    start : event.start.format(),
+                    delta : delta/86400000
+                };
+                console.log("바뀐 델타 : " + obj.delta);
+                alert(event.title + " was dropped on " + event.start.format());
+
+                if (!confirm("Are you sure about this change?")) {
+                    revertFunc();
+                }
+                else{
+                    dragUpdateEvent(obj,function(success){
+                        console.log("dragUpdateEvent 들어옴");
+                        if (success){
+                            $('#calendar').fullCalendar( 'updateEvent', event);
+                            $('#calendar').fullCalendar( 'refetchEvents');
+                            $('#calendar').fullCalendar('rerenderEvents');
+                        }
+                        else {
+                            alert("실패");
+                        }
+                    });
+                }
+
             }
         });
     });
+
+    function addEvent(obj, callback){
+        $.ajax({
+            url: '/calendar/add',
+            type: 'POST',
+            data: obj,
+            success: function(data){
+                callback(true);
+            },
+            error: function(e){
+                callback(false);
+            }
+        });
+    }
+
+    function removeEvent(obj, callback){
+
+        console.log("removeEvent 들어옴aslkdalskdnl", obj);
+        $.ajax({
+            url: '/calendar/remove',
+            type: 'POST',
+            data: {id:obj},
+            success: function(data){
+                callback(true);
+            },
+            error: function(e){
+                callback(false);
+            }
+        });
+    }
+    function updateEvent(obj, callback){
+
+        console.log("updateEvent 들어옴aslkdalskdnl", obj);
+        $.ajax({
+            url: '/calendar/update',
+            type: 'POST',
+            data: {id : obj.id,
+            title : obj.title},
+            success: function(data){
+                callback(true);
+            },
+            error: function(e){
+                callback(false);
+            }
+        });
+    }
+
+    function dragUpdateEvent(obj,callback){
+        console.log("dragUpdateEvent 들어옴", obj);
+        $.ajax({
+            url: '/calendar/update_drag',
+            type: 'POST',
+            data: { id : obj.id,
+                    start : obj.start,
+                    delta : obj.delta
+            },
+            success: function(data){
+                callback(true);
+            },
+            error: function(e){
+                callback(false);
+            }
+        });
+    }
+
+    function resizeUpdateEvent(obj,callback){
+        console.log("resizeUpdateEvent 함수안으로!들어옴", obj);
+        $.ajax({
+            url: '/calendar/update_resize',
+            type: 'POST',
+            data: { id : obj.id,
+                end : obj.end,
+                delta : obj.delta
+            },
+            success: function(data){
+                callback(true);
+            },
+            error: function(e){
+                callback(false);
+            }
+        });
+    }
 </script>
 
 <body>
@@ -45,6 +270,13 @@
 <div class="container">
 
     <div id='calendar'></div>
+
+    <div id="eventContent" title="Event Details" style="display:none;">
+        Start: <span id="startTime"></span><br>
+        End: <span id="endTime"></span><br><br>
+        <!--<p id="eventInfo"></p>-->
+        <!--<p><strong><a id="eventLink" href="" target="_blank">Read More</a></strong></p>-->
+    </div>
 
 </div>
 

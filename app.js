@@ -19,6 +19,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var classes = require('./routes/class');
 var group = require('./routes/group');
+var calendar = require('./routes/calendar');
 var app = express();
 
 
@@ -45,6 +46,7 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/class', classes);
 app.use('/group', group);
+app.use('/calendar',calendar);
 var port = 9898;
 app.set('port', port);
 

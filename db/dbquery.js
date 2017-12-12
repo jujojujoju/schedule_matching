@@ -230,3 +230,191 @@ module.exports.getClassInfo = function (CID, callback) {
     });
 };
 
+module.exports.getCalendar = function (ID, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" "+
+                "FROM EVENTS " +
+                "WHERE PG_ID ="+ID;
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    });
+            }
+        });
+    });
+};
+
+module.exports.addEvent = function (event_info,user_id, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                console.log("쿼리실행전 에러");
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var s = "INSERT INTO EVENTS VALUES(EVENT_SEQ.nextval,'"+
+                    event_info.title+"',TO_DATE('"+event_info.start+"'),"+
+                    "TO_DATE('"+event_info.end+"'),\'asd\',\'red\',\'P\',"+user_id+")";
+                console.log(s);
+                statement.executeUpdate(s,
+                    function (err, count) {
+                        if (err) {
+                            console.log("쿼리실행후 에러남");
+                            callback(err);
+                        } else {
+                            console.log("쿼리실행후 에러 안남");
+                            callback(count);
+                        }
+                    });
+            }
+        });
+    });
+};
+
+module.exports.removeEvent = function (event_id, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                console.log("쿼리실행전 에러");
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var s = "DELETE FROM EVENTS "+
+                "WHERE EVENT_ID="+event_id;
+                console.log(s);
+                statement.executeUpdate(s,
+                    function (err, count) {
+                        if (err) {
+                            console.log("쿼리실행후 에러남");
+                            callback(err);
+                        } else {
+                            console.log("쿼리실행후 에러 안남");
+                            callback(count);
+                        }
+                    });
+            }
+        });
+    });
+};
+
+module.exports.updateEvent = function (event_id,newTitle, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                console.log("쿼리실행전 에러");
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var s = "UPDATE EVENTS "+
+                "SET TITLE ='" +newTitle +"' "+
+                "WHERE EVENT_ID ="+event_id;
+                console.log(s);
+                statement.executeUpdate(s,
+                    function (err, count) {
+                        if (err) {
+                            console.log("쿼리실행후 에러남");
+                            callback(err);
+                        } else {
+                            console.log("쿼리실행후 에러 안남");
+                            callback(count);
+                        }
+                    });
+            }
+        });
+    });
+};
+
+
+module.exports.updateDragEvent = function (event_id,start,delta, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                console.log("쿼리실행전 에러");
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var s;
+                if(delta <0){
+                s= "UPDATE EVENTS "+
+                    "SET T_START ='" +start+"', "+
+                    "T_END = T_END "+ delta+
+                    " WHERE EVENT_ID ="+event_id;
+                }
+                else{
+                    s= "UPDATE EVENTS "+
+                        "SET T_START ='" +start+"', "+
+                        "T_END = T_END +"+ delta+
+                        " WHERE EVENT_ID ="+event_id;
+                }
+
+                console.log(s);
+                statement.executeUpdate(s,
+                    function (err, count) {
+                        if (err) {
+                            console.log("쿼리실행후 에러남");
+                            callback(err);
+                        } else {
+                            console.log("쿼리실행후 에러 안남");
+                            callback(count);
+                        }
+                    });
+            }
+        });
+    });
+};
+
+module.exports.updateResizeEvent = function (event_id,end,delta, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                console.log("쿼리실행전 에러");
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var s= "UPDATE EVENTS "+
+                        "SET T_END = T_END +"+ delta+
+                        " WHERE EVENT_ID ="+event_id;
+                console.log(s);
+                statement.executeUpdate(s,
+                    function (err, count) {
+                        if (err) {
+                            console.log("쿼리실행후 에러남");
+                            callback(err);
+                        } else {
+                            console.log("쿼리실행후 에러 안남");
+                            callback(count);
+                        }
+                    });
+            }
+        });
+    });
+};
