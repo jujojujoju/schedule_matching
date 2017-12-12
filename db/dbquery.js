@@ -139,7 +139,6 @@ module.exports.signup = function (input, callback) {
 };
 
 
-
 module.exports.getClassList = function (ID, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
@@ -206,7 +205,7 @@ module.exports.getClassList_distinct = function (ID, callback) {
     });
 };
 
-module.exports.getClassInfo = function (CID,USERID, callback) {
+module.exports.getClassInfo = function (CID, USERID, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
         conn.createStatement(function (err, statement) {
@@ -215,15 +214,15 @@ module.exports.getClassInfo = function (CID,USERID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT * FROM( SELECT * FROM "+
+                var query = "SELECT * FROM( SELECT * FROM " +
                     "(SELECT * FROM CLASS " +
-                "WHERE CLASSID IN (SELECT CLASSID FROM USER_CLASS "+
-                "WHERE USERID = "+USERID+") " +
-                "ORDER BY CLASSID ASC) A " +
-                "NATURAL JOIN " +
-                "(SELECT * " +
-                "FROM CLASS_TIME) B)C " +
-                "WHERE C.CLASSID = '" +CID+"'";
+                    "WHERE CLASSID IN (SELECT CLASSID FROM USER_CLASS " +
+                    "WHERE USERID = " + USERID + ") " +
+                    "ORDER BY CLASSID ASC) A " +
+                    "NATURAL JOIN " +
+                    "(SELECT * " +
+                    "FROM CLASS_TIME) B)C " +
+                    "WHERE C.CLASSID = '" + CID + "'";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -398,11 +397,9 @@ module.exports.getBoardList = function (data, callback) {
                         // 1~10페이지는 1로, 11~20페이지는 11로 --> 숫자 첫째자리수를 1로 고정
                         var startPage = Math.floor((data.page - 1) / pageSize) * pageSize + 1;
                         var endPage = startPage + (pageSize - 1);
-
                         if (endPage > totalPage) {
                             endPage = totalPage;
                         }
-
                         var query = "SELECT * FROM " +
                             "(SELECT bb.boardid bid, bb.groupid gid, bb.classid cid, pp.postid pid, " +
                             "pp.title pti, pp.content pco, pp.writer pw, pp.time pt " +
@@ -420,19 +417,38 @@ module.exports.getBoardList = function (data, callback) {
                             } else {
                                 console.log('Get list query : ', query);
                                 resultset.toObjArray(function (err, results) {
-                                    db_init.release(connObj, function (err) {
-                                        var newdata = {
-                                            title: "전체게시판",
-                                            results: results,
-                                            page: data.page,
-                                            pageSize: pageSize,
-                                            startPage: startPage,
-                                            endPage: endPage,
-                                            totalPage: totalPage
-                                        };
-                                        callback(newdata);
-                                    });
+                                    var newdata = {
+                                        title: "전체게시판",
+                                        results: results,
+                                        page: data.page,
+                                        pageSize: pageSize,
+                                        startPage: startPage,
+                                        endPage: endPage,
+                                        totalPage: totalPage
+                                    };
+                                    query = "SELECT BOARDID FROM BOARD WHERE GROUPID=" + data.groupid;
+                                    console.log(query);
+                                    statement.executeQuery(query, function (err, resultset) {
+                                        if (err) {
+                                            console.log(err);
+                                            console.log("Error before executeQuery");
+                                            db_init.release(connObj, function () {
+                                            });
+                                            callback(false);
+                                        } else {
+                                            resultset.toObjArray(function (err, results2) {
 
+                                                db_init.release(connObj, function (err) {
+                                                    newdata.boardid = results2[0].BOARDID;
+                                                    // console.log(results2)
+                                                    // console.log(results2[0])
+                                                    console.log(results2)
+                                                    callback(newdata);
+
+                                                });
+                                            })
+                                        }
+                                    })
                                 });
                             }
                         });
@@ -454,9 +470,9 @@ module.exports.getCalendar = function (ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" "+
+                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" " +
                     "FROM EVENTS " +
-                    "WHERE PG_ID ="+ID;
+                    "WHERE PG_ID =" + ID;
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -488,8 +504,8 @@ module.exports.removeEvent = function (event_id, callback) {
                 });
                 callback(false);
             } else {
-                var s = "DELETE FROM EVENTS "+
-                    "WHERE EVENT_ID="+event_id;
+                var s = "DELETE FROM EVENTS " +
+                    "WHERE EVENT_ID=" + event_id;
                 console.log(s);
                 statement.executeUpdate(s,
                     function (err, count) {
@@ -506,7 +522,7 @@ module.exports.removeEvent = function (event_id, callback) {
     });
 };
 
-module.exports.updateEvent = function (event_id,newTitle, callback) {
+module.exports.updateEvent = function (event_id, newTitle, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
         conn.createStatement(function (err, statement) {
@@ -516,9 +532,9 @@ module.exports.updateEvent = function (event_id,newTitle, callback) {
                 });
                 callback(false);
             } else {
-                var s = "UPDATE EVENTS "+
-                    "SET TITLE ='" +newTitle +"' "+
-                    "WHERE EVENT_ID ="+event_id;
+                var s = "UPDATE EVENTS " +
+                    "SET TITLE ='" + newTitle + "' " +
+                    "WHERE EVENT_ID =" + event_id;
                 console.log(s);
                 statement.executeUpdate(s,
                     function (err, count) {
@@ -536,7 +552,7 @@ module.exports.updateEvent = function (event_id,newTitle, callback) {
 };
 
 
-module.exports.updateDragEvent = function (event_id,start,delta, callback) {
+module.exports.updateDragEvent = function (event_id, start, delta, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
         conn.createStatement(function (err, statement) {
@@ -547,17 +563,17 @@ module.exports.updateDragEvent = function (event_id,start,delta, callback) {
                 callback(false);
             } else {
                 var s;
-                if(delta <0){
-                    s= "UPDATE EVENTS "+
-                        "SET T_START ='" +start+"', "+
-                        "T_END = T_END "+ delta+
-                        " WHERE EVENT_ID ="+event_id;
+                if (delta < 0) {
+                    s = "UPDATE EVENTS " +
+                        "SET T_START ='" + start + "', " +
+                        "T_END = T_END " + delta +
+                        " WHERE EVENT_ID =" + event_id;
                 }
-                else{
-                    s= "UPDATE EVENTS "+
-                        "SET T_START ='" +start+"', "+
-                        "T_END = T_END +"+ delta+
-                        " WHERE EVENT_ID ="+event_id;
+                else {
+                    s = "UPDATE EVENTS " +
+                        "SET T_START ='" + start + "', " +
+                        "T_END = T_END +" + delta +
+                        " WHERE EVENT_ID =" + event_id;
                 }
 
                 console.log(s);
@@ -575,8 +591,6 @@ module.exports.updateDragEvent = function (event_id,start,delta, callback) {
         });
     });
 };
-
-
 
 
 module.exports.getMessages = function (data, callback) {
@@ -633,8 +647,7 @@ module.exports.getMessages = function (data, callback) {
 };
 
 
-
-module.exports.addEvent = function (event_info,user_id, callback) {
+module.exports.addEvent = function (event_info, user_id, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
         conn.createStatement(function (err, statement) {
@@ -644,9 +657,9 @@ module.exports.addEvent = function (event_info,user_id, callback) {
                 });
                 callback(false);
             } else {
-                var s = "INSERT INTO EVENTS VALUES(EVENT_SEQ.nextval,'"+
-                    event_info.title+"',TO_DATE('"+event_info.start+"'),"+
-                    "TO_DATE('"+event_info.end+"'),\'asd\',\'red\',\'P\',"+user_id+")";
+                var s = "INSERT INTO EVENTS VALUES(EVENT_SEQ.nextval,'" +
+                    event_info.title + "',TO_DATE('" + event_info.start + "')," +
+                    "TO_DATE('" + event_info.end + "'),\'asd\',\'red\',\'P\'," + user_id + ")";
                 console.log(s);
                 statement.executeUpdate(s,
                     function (err, count) {
@@ -663,9 +676,7 @@ module.exports.addEvent = function (event_info,user_id, callback) {
     });
 };
 
-
-
-module.exports.updateResizeEvent = function (event_id,end,delta, callback) {
+module.exports.updateResizeEvent = function (event_id, end, delta, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
         conn.createStatement(function (err, statement) {
@@ -695,19 +706,7 @@ module.exports.updateResizeEvent = function (event_id,end,delta, callback) {
     });
 
 };
-/*
-SELECT CLASSID,CLASSNAME,PROFNAME,DAY,STARTTIME,ENDTIME,CLASSLOC
-FROM(
-(SELECT *
-FROM(
-CLASS
-NATURAL JOIN
-USER_CLASS)
-WHERE USERID = 2012104102) A
-NATURAL JOIN
-CLASS_TIME)
-ORDER BY CLASSID ASC, DAY DESC;
- */
+
 module.exports.getWeekSchedule = function (ID, callback) {
     console.log("getWeekSchedule들어옴");
     db_init.reserve(function (connObj) {
@@ -737,9 +736,36 @@ module.exports.getWeekSchedule = function (ID, callback) {
                                     callback(results);
                                 });
                             });
+
+
+
+
+};
+
+                  module.exports.writepost = function (data, callback) {
+
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                console.log(err);
+                callback(err);
+            } else {
+                var query = "INSERT INTO posts VALUES (post_seq.nextval, " + data.boardid + ", '" + data.title + "', '"
+                    + data.content + "', " + data.writer + ", sysdate)";
+                console.log(query);
+                statement.executeUpdate(query,
+                    function (err, count) {
+                        if (err) {
+                            console.log(err);
+                            callback(err);
+                        } else {
+                            callback(count);
+
                         }
                     });
             }
         });
     });
+
 };

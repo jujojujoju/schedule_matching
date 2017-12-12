@@ -13,27 +13,52 @@ function isLogin(req, res, next) {
 }
 
 router.get('/', function (req, res, next) {
-    var boardflag = 'group';
-    if (boardflag == 'group') {
-        var data = {
-            page : 1,
-            groupid: 8
-        };
-        db_.getBoardList(data, function (result) {
-            if (result) {
-                console.log("get list ok");
-                console.log("date");
-                // data.results = result;
-                result.groupid = data.groupid;
-                res.render('board',result)
-            } else {
-                console.log('result error');
-            }
-        });
+    var params = url.parse(req.url, true).query;
+        console.log(params['id']);
+        //세가지로 나눈다
+        // 그룹으로 접근
+        // 보드아이디로 접근
+        // 클래스아이디로접근
+        var boardflag = 'group';
+        if (boardflag == 'group') {
+            var data = {
+                page: 1,
+                groupid: params['id']
+            };
+            db_.getBoardList(data, function (result) {
+                if (result) {
+                    console.log("get list ok");
+                    console.log("++=================" + result);
+                    res.render('board', result)
+                } else {
+                    console.log('result error');
+                }
+            });
+        }
 
-    }
+});
 
+router.post('/write', function (req, res, next) {
+    var title = req.body.title
+    var content = req.body.contents
+    var boardid = req.body.boardid
+    console.log(boardid)
 
+    var data = {
+        title: title,
+        content: content,
+        boardid: boardid,
+        writer: req.session.info.userid
+    };
+    db_.writepost(data, function (result) {
+        if (result) {
+            console.log("write ok");
+            res.redirect('/board');
+        } else {
+            console.log(result);
+            console.log('result error');
+        }
+    });
 });
 
 
