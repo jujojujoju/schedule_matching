@@ -7,6 +7,8 @@
 <script src='/fullcalendar/dist/fullcalendar.js'></script>
 
 <script>
+    var ls = <%- JSON.stringify(list) %>;
+    console.log(ls);
     $(document).ready(function () {
         $('#calendar').fullCalendar({
             header: {
@@ -14,14 +16,8 @@
                 center: 'title',
                 right: ''
             },
-            events: [
-                {
-                    title: 'My Event',
-                    start: '2017-11-15',
-                    description: 'This is a cool event'
-                }
-            ],
-            editable: true,
+            events: ls ,
+            editable: false,
             allDayDefault: false,
             defaultView: 'agendaWeek',
             dayClick: function (start, end, jsEvent, view) {

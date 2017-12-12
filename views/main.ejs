@@ -46,7 +46,12 @@
         <button type="button" class="btn btn-danger" onclick="moveToClass()">수업페이지 이동</button>
         <button type="button" class="btn btn-danger" onclick="moveToCalendar()">달력페이지 이동</button>
         <button type="button" class="btn btn-danger" onclick="moveToMessages()">쪽지함으로 이동</button>
+
+        <button type="button" class="btn btn-danger" onclick="moveToBoard()">게시판</button>
+        <button type="button" class="btn btn-danger" onclick="moveToSheduler()">시간표</button>
+
         <!--<button type="button" class="btn btn-danger" onclick="moveToBoard()">게시판</button>-->
+
 
     </div>
 
@@ -77,6 +82,15 @@
     }
     function moveToMessages() {
         location.href = "/messages"
+    }
+
+    function moveToBoard() {
+        location.href = '/board'
+
+    }
+    function moveToSheduler() {
+        location.href = '/scheduler'
+
     }
 </script>
 

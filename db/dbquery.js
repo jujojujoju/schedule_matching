@@ -707,7 +707,42 @@ module.exports.updateResizeEvent = function (event_id, end, delta, callback) {
 
 };
 
-module.exports.writepost = function (data, callback) {
+module.exports.getWeekSchedule = function (ID, callback) {
+    console.log("getWeekSchedule들어옴");
+    db_init.reserve(function (connObj) {
+        console.log("reserve들어옴");
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            console.log("createStatement들어옴");
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT CLASSID,CLASSNAME,PROFNAME,DAY,STARTTIME,ENDTIME,CLASSLOC "+
+                    "FROM((SELECT * FROM( CLASS NATURAL JOIN USER_CLASS) WHERE USERID ="+ ID+
+            ") A NATURAL JOIN CLASS_TIME) ORDER BY CLASSID ASC, DAY DESC";
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+
+
+
+
+};
+
+                  module.exports.writepost = function (data, callback) {
 
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
@@ -726,9 +761,11 @@ module.exports.writepost = function (data, callback) {
                             callback(err);
                         } else {
                             callback(count);
+
                         }
                     });
             }
         });
     });
+
 };

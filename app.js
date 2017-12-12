@@ -21,7 +21,7 @@ var classes = require('./routes/class');
 var group = require('./routes/group');
 
 var calendar = require('./routes/calendar');
-
+var scheduler = require('./routes/scheduler');
 var message = require('./routes/message');
 var board = require('./routes/board');
 
@@ -52,7 +52,7 @@ app.use('/class', classes);
 app.use('/group', group);
 
 app.use('/calendar',calendar);
-
+app.use('/scheduler',scheduler);
 app.use('/board', board);
 app.use('/messages', message);
 
