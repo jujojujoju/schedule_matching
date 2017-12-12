@@ -139,38 +139,6 @@ module.exports.signup = function (input, callback) {
 };
 
 
-module.exports.getClassList_distinct = function (ID, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var query = "SELECT DISTINCT CLASSID, CLASSNAME\n" +
-                    "FROM CLASS\n" +
-                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID + ")";
-                console.log(query);
-                statement.executeQuery(query,
-                    function (err, resultset) {
-                        if (err) {
-                            console.log(err);
-                            db_init.release(connObj, function () {
-                            });
-                            callback(false);
-                        } else {
-                            resultset.toObjArray(function (err, results) {
-                                db_init.release(connObj, function (err) {
-                                    callback(results);
-                                });
-                            });
-                        }
-                    });
-            }
-        });
-    });
-};
 
 module.exports.getClassList = function (ID, callback) {
     db_init.reserve(function (connObj) {
@@ -205,7 +173,7 @@ module.exports.getClassList = function (ID, callback) {
     });
 };
 
-module.exports.getClassInfo = function (CID, callback) {
+module.exports.getClassList_distinct = function (ID, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
         conn.createStatement(function (err, statement) {
@@ -214,7 +182,48 @@ module.exports.getClassInfo = function (CID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT * FROM CLASS WHERE CLASSID='" + CID + "' ORDER BY DAY DESC";
+                var query = "SELECT DISTINCT CLASSID, CLASSNAME\n" +
+                    "FROM CLASS\n" +
+                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID + ")";
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    });
+            }
+        });
+    });
+};
+
+module.exports.getClassInfo = function (CID,USERID, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT * FROM( SELECT * FROM "+
+                    "(SELECT * FROM CLASS " +
+                "WHERE CLASSID IN (SELECT CLASSID FROM USER_CLASS "+
+                "WHERE USERID = "+USERID+") " +
+                "ORDER BY CLASSID ASC) A " +
+                "NATURAL JOIN " +
+                "(SELECT * " +
+                "FROM CLASS_TIME) B)C " +
+                "WHERE C.CLASSID = '" +CID+"'";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -335,58 +344,6 @@ module.exports.createGroup = function (data, callback) {
 
 };
 
-module.exports.getMessages = function (data, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var query;
-                if (data.flag == 0) {
-                    query = "SELECT * FROM MESSAGES WHERE RECEIVERID=" + data.id;
-                    console.log(query);
-                    statement.executeQuery(query,
-                        function (err, resultset) {
-                            if (err) {
-                                console.log(err);
-                                db_init.release(connObj, function () {
-                                });
-                                callback(false);
-                            } else {
-                                resultset.toObjArray(function (err, results) {
-                                    db_init.release(connObj, function (err) {
-                                        callback(results);
-                                    });
-                                });
-                            }
-                        });
-                } else {
-                    query = "SELECT * FROM MESSAGES WHERE SENDERID=" + data.id;
-                    console.log(query);
-                    statement.executeQuery(query,
-                        function (err, resultset) {
-                            if (err) {
-                                console.log(err);
-                                db_init.release(connObj, function () {
-                                });
-                                callback(false);
-                            } else {
-                                resultset.toObjArray(function (err, results) {
-                                    db_init.release(connObj, function (err) {
-                                        callback(results);
-                                    });
-                                });
-                            }
-                        });
-
-                }
-            }
-        });
-    });
-};
 
 module.exports.sendMessage = function (data, callback) {
 
@@ -521,35 +478,6 @@ module.exports.getCalendar = function (ID, callback) {
     });
 };
 
-module.exports.addEvent = function (event_info,user_id, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                console.log("쿼리실행전 에러");
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var s = "INSERT INTO EVENTS VALUES(EVENT_SEQ.nextval,'"+
-                    event_info.title+"',TO_DATE('"+event_info.start+"'),"+
-                    "TO_DATE('"+event_info.end+"'),\'asd\',\'red\',\'P\',"+user_id+")";
-                console.log(s);
-                statement.executeUpdate(s,
-                    function (err, count) {
-                        if (err) {
-                            console.log("쿼리실행후 에러남");
-                            callback(err);
-                        } else {
-                            console.log("쿼리실행후 에러 안남");
-                            callback(count);
-                        }
-                    });
-            }
-        });
-    });
-};
-
 module.exports.removeEvent = function (event_id, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
@@ -648,105 +576,8 @@ module.exports.updateDragEvent = function (event_id,start,delta, callback) {
     });
 };
 
-module.exports.getGroupList = function (callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var query = "SELECT G.GROUPID, G.GROUPNAME, U.NAME, G.CREATEDATE FROM GRP G JOIN USERS U ON G.LEADERID=U.USERID";
-                console.log(query);
-                statement.executeQuery(query,
-                    function (err, resultset) {
-                        if (err) {
-                            console.log(err);
-                            db_init.release(connObj, function () {
-                            });
-                            callback(false);
-                        } else {
-                            resultset.toObjArray(function (err, results) {
-                                db_init.release(connObj, function (err) {
-                                    callback(results);
-                                });
-                            });
-                        }
-                    });
-            }
-        });
-    });
 
-};
 
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
-module.exports.createGroup = function (data, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var query = "INSERT INTO GRP VALUES (grp_seq.nextval, '" + data.groupname + "', " + data.leaderid + ", '" + getRandomColor() + "', sysdate)";
-                console.log(query);
-                statement.executeUpdate(query,
-                    function (err, count) {
-                        if (err) {
-                            callback(err);
-                        } else {
-                            query = "SELECT * FROM (SELECT * FROM GRP WHERE GROUPNAME = '" + data.groupname + "' ORDER BY GROUPID DESC) WHERE ROWNUM = 1";
-                            statement.executeQuery(query, function (err, resultset) {
-                                if (err) {
-                                    console.log(err);
-                                    db_init.release(connObj, function () {
-                                    });
-                                    callback(false);
-                                } else {
-                                    resultset.toObjArray(function (err, results) {
-                                        if (err) {
-                                            console.log(err);
-                                            db_init.release(connObj, function () {
-                                            });
-                                            callback(false);
-                                        } else {
-                                            console.log(results[0].GROUPID);
-                                            query = "INSERT INTO BOARD (BOARDID, GROUPID) " +
-                                                "VALUES (board_seq.nextval, " + results[0].GROUPID + ")";
-                                            statement.executeUpdate(query,
-                                                function (err, count) {
-                                                    if (err) {
-                                                        callback(err);
-                                                    } else {
-                                                        db_init.release(connObj, function (err) {
-                                                            callback(results);
-                                                        });
-                                                    }
-                                                })
-                                        }
-
-                                    });
-                                }
-                            });
-
-                        }
-                    });
-            }
-        });
-    })
-    ;
-
-};
 
 module.exports.getMessages = function (data, callback) {
     db_init.reserve(function (connObj) {
@@ -801,137 +632,7 @@ module.exports.getMessages = function (data, callback) {
     });
 };
 
-module.exports.sendMessage = function (data, callback) {
 
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                console.log(err);
-                callback(err);
-            } else {
-                var query = "INSERT INTO MESSAGES VALUES (message_seq.nextval, "
-                    + data.sender + ", " + data.receiver + ", '"
-                    + data.contents + "', sysdate)";
-                console.log(query);
-                statement.executeUpdate(query,
-                    function (err, count) {
-                        if (err) {
-                            console.log(err);
-                            callback(err);
-                        } else {
-                            callback(null, count);
-                        }
-                    });
-            }
-        });
-    });
-};
-
-module.exports.getBoardList = function (data, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                console.log("ERR[before query]");
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var sql = "select count(*) cnt from board";
-                statement.executeQuery(sql, function (err, resultset) {
-
-                    var size = 10;  // 한 페이지에 보여줄 개수
-                    var begin = (data.page - 1) * size + 1; // 시작 글
-                    var end = data.page * size;
-
-                    resultset.toObjArray(function (err, results) {
-                        var totalCount = Number(results[0].CNT); // 크롤링 해온 전체 글의 갯수
-
-                        var totalPage = Math.ceil(totalCount / size);  // 전체 페이지의 수 (116 / 10 = 12..)
-                        var pageSize = 10; // 페이지 링크의 개수, 10개씩 보여주고 10개씩 넘어감
-
-                        // 1~10페이지는 1로, 11~20페이지는 11로 --> 숫자 첫째자리수를 1로 고정
-                        var startPage = Math.floor((data.page - 1) / pageSize) * pageSize + 1;
-                        var endPage = startPage + (pageSize - 1);
-
-                        if (endPage > totalPage) {
-                            endPage = totalPage;
-                        }
-
-                        var query = "SELECT * FROM " +
-                            "(SELECT bb.boardid bid, pp.postid pid, pp.title pti, pp.content pco, pp.writer pw, pp.time pt " +
-                            "FROM board bb JOIN posts pp " +
-                            "ON bb.boardid = pp.boardid " +
-                            "WHERE bb.groupid = " + data.groupid + " ORDER BY bid DESC) " +
-                            "WHERE ROWNUM BETWEEN " + begin + " AND " + end;
-                        statement.executeQuery(query, function (err, resultset) {
-                            if (err) {
-                                console.log(err);
-                                console.log("Error before executeQuery");
-                                db_init.release(connObj, function () {
-                                });
-                                callback(false);
-                            } else {
-                                console.log('Get list query : ', query);
-                                resultset.toObjArray(function (err, results) {
-                                    db_init.release(connObj, function (err) {
-                                        var newdata = {
-                                            title: "전체게시판",
-                                            results: results,
-                                            page: data.page,
-                                            pageSize: pageSize,
-                                            startPage: startPage,
-                                            endPage: endPage,
-                                            totalPage: totalPage
-                                        };
-                                        callback(newdata);
-                                    });
-
-                                });
-                            }
-                        });
-                    });
-
-                });
-
-            }
-        });
-    });
-};
-
-module.exports.getCalendar = function (ID, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" "+
-                    "FROM EVENTS " +
-                    "WHERE PG_ID ="+ID;
-                console.log(query);
-                statement.executeQuery(query,
-                    function (err, resultset) {
-                        if (err) {
-                            console.log(err);
-                            db_init.release(connObj, function () {
-                            });
-                            callback(false);
-                        } else {
-                            resultset.toObjArray(function (err, results) {
-                                db_init.release(connObj, function (err) {
-                                    callback(results);
-                                });
-                            });
-                        }
-                    });
-            }
-        });
-    });
-};
 
 module.exports.addEvent = function (event_info,user_id, callback) {
     db_init.reserve(function (connObj) {
@@ -962,103 +663,7 @@ module.exports.addEvent = function (event_info,user_id, callback) {
     });
 };
 
-module.exports.removeEvent = function (event_id, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                console.log("쿼리실행전 에러");
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var s = "DELETE FROM EVENTS "+
-                    "WHERE EVENT_ID="+event_id;
-                console.log(s);
-                statement.executeUpdate(s,
-                    function (err, count) {
-                        if (err) {
-                            console.log("쿼리실행후 에러남");
-                            callback(err);
-                        } else {
-                            console.log("쿼리실행후 에러 안남");
-                            callback(count);
-                        }
-                    });
-            }
-        });
-    });
-};
 
-module.exports.updateEvent = function (event_id,newTitle, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                console.log("쿼리실행전 에러");
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var s = "UPDATE EVENTS "+
-                    "SET TITLE ='" +newTitle +"' "+
-                    "WHERE EVENT_ID ="+event_id;
-                console.log(s);
-                statement.executeUpdate(s,
-                    function (err, count) {
-                        if (err) {
-                            console.log("쿼리실행후 에러남");
-                            callback(err);
-                        } else {
-                            console.log("쿼리실행후 에러 안남");
-                            callback(count);
-                        }
-                    });
-            }
-        });
-    });
-};
-
-
-module.exports.updateDragEvent = function (event_id,start,delta, callback) {
-    db_init.reserve(function (connObj) {
-        var conn = connObj.conn;
-        conn.createStatement(function (err, statement) {
-            if (err) {
-                console.log("쿼리실행전 에러");
-                db_init.release(connObj, function () {
-                });
-                callback(false);
-            } else {
-                var s;
-                if(delta <0){
-                    s= "UPDATE EVENTS "+
-                        "SET T_START ='" +start+"', "+
-                        "T_END = T_END "+ delta+
-                        " WHERE EVENT_ID ="+event_id;
-                }
-                else{
-                    s= "UPDATE EVENTS "+
-                        "SET T_START ='" +start+"', "+
-                        "T_END = T_END +"+ delta+
-                        " WHERE EVENT_ID ="+event_id;
-                }
-
-                console.log(s);
-                statement.executeUpdate(s,
-                    function (err, count) {
-                        if (err) {
-                            console.log("쿼리실행후 에러남");
-                            callback(err);
-                        } else {
-                            console.log("쿼리실행후 에러 안남");
-                            callback(count);
-                        }
-                    });
-            }
-        });
-    });
-};
 
 module.exports.updateResizeEvent = function (event_id,end,delta, callback) {
     db_init.reserve(function (connObj) {

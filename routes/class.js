@@ -32,7 +32,7 @@ router.get('/page', isLogin, function (req, res, next) {
     console.log(cid);
     var class_info;
     //수업정보를 받아오고~
-    db_.getClassInfo(cid, function (results) {
+    db_.getClassInfo(cid,req.session.info.userid, function (results) {
         //수업의 종류에 따라 구분하여 class_info 넣어줌
         if (results.length == 1) {
             class_info = {
