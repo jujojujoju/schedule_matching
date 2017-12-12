@@ -13,21 +13,44 @@
 <body>
 <div class="container" style="width: 50%; margin-left: 10%;">
     <table class="table table-bordered table-hover">
+        받은 메세지
         <tr>
             <th>번호</th>
             <th>보낸 이</th>
-            <th>받는 이</th>
+            <!--<th>받는 이</th>-->
             <th>보낸날짜</th>
         </tr>
         <%
-        for(var i = 0; i < results.length; i++)
+        for(var i = 0; i < receivedmessages.length; i++)
         {
         %>
         <tr>
             <td><%= i + 1 %></td>
-            <td><%= results[i].SENDERID %></td>
-            <td><%= results[i].RECEIVERID %></td>
-            <td><%= results[i].SENDTIME %></td>
+            <td><a onclick="resendMessage('<%= receivedmessages[i].SENDERID %>')"><%= receivedmessages[i].SENDERID %></a></td>
+            <td><%= receivedmessages[i].SENDTIME %></td>
+        </tr>
+        <%
+        }
+        %>
+    </table>
+</div>
+<div class="container" style="width: 50%; margin-left: 10%;">
+    <table class="table table-bordered table-hover">
+        보낸 메세지
+        <tr>
+            <th>번호</th>
+            <!--<th>보낸 이</th>-->
+            <th>받는 이</th>
+            <th>보낸날짜</th>
+        </tr>
+        <%
+        for(var i = 0; i < sendedmessages.length; i++)
+        {
+        %>
+        <tr>
+            <td><%= i + 1 %></td>
+            <td><a onclick="resendMessage('<%= sendedmessages[i].RECEIVERID %>')"><%= sendedmessages[i].RECEIVERID %></a></td>
+            <td><%= sendedmessages[i].SENDTIME %></td>
         </tr>
         <%
         }
@@ -42,18 +65,36 @@
         </div>
         <div class="form-group">
             <label>내용</label>
-            <input type="text" style="line-height: 150%" class="form-control" id="contents" name="contents" placeholder="contents">
+            <textarea rows="10" cols="50" class="form-control" id="contents" name="contents" placeholder="contents"></textarea>
         </div>
         <button type="submit" class="btn btn-default" >Submit</button>
     </form>
-    <!--<button type="button" class="btn btn-danger" onclick="sendMessage()">쪽지 보내기</button>-->
 </div>
 </body>
 
 <script type="text/javascript">
-    function sendMessage() {
+    function resendMessage(id) {
+        $("#receiverid").focus();
+        $("#receiverid").val(id);
+        $("#contents").val('');
 
-//        location.href = "/group/?id=" + id + "&name=" + name;
+//        var groupname = prompt("메세지 내용입력");
+//        if (groupname != null) {
+//            console.log("메세지완료")
+//            location.href = "/group/create/?name=" + groupname;
+//        }
+
+//        $.ajax({
+//            url: '/class/getsch',
+//            type: 'POST',
+//            data: {userIDs: users[i]},
+//            success: function (result) {
+//                for (var i = 0; i < result.length; i++) {
+//                    $('#classes').append($('<li>').text(result[i].CLASSID + result[i].CLASSNAME));
+//                    console.log("" + result[i].CLASSID + "" + result[i].CLASSNAME)
+//                }
+//            }
+//        });
     }
 </script>
 

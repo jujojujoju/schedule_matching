@@ -311,7 +311,7 @@ module.exports.createGroup = function (data, callback) {
 
 };
 
-module.exports.getMessages = function (callback) {
+module.exports.getMessages = function (data, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
         conn.createStatement(function (err, statement) {
@@ -320,23 +320,45 @@ module.exports.getMessages = function (callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT * FROM MESSAGES";
-                console.log(query);
-                statement.executeQuery(query,
-                    function (err, resultset) {
-                        if (err) {
-                            console.log(err);
-                            db_init.release(connObj, function () {
-                            });
-                            callback(false);
-                        } else {
-                            resultset.toObjArray(function (err, results) {
-                                db_init.release(connObj, function (err) {
-                                    callback(results);
+                var query;
+                if (data.flag == 0) {
+                    query = "SELECT * FROM MESSAGES WHERE RECEIVERID=" + data.id;
+                    console.log(query);
+                    statement.executeQuery(query,
+                        function (err, resultset) {
+                            if (err) {
+                                console.log(err);
+                                db_init.release(connObj, function () {
                                 });
-                            });
-                        }
-                    });
+                                callback(false);
+                            } else {
+                                resultset.toObjArray(function (err, results) {
+                                    db_init.release(connObj, function (err) {
+                                        callback(results);
+                                    });
+                                });
+                            }
+                        });
+                }else{
+                    query = "SELECT * FROM MESSAGES WHERE SENDERID=" + data.id;
+                    console.log(query);
+                    statement.executeQuery(query,
+                        function (err, resultset) {
+                            if (err) {
+                                console.log(err);
+                                db_init.release(connObj, function () {
+                                });
+                                callback(false);
+                            } else {
+                                resultset.toObjArray(function (err, results) {
+                                    db_init.release(connObj, function (err) {
+                                        callback(results);
+                                    });
+                                });
+                            }
+                        });
+
+                }
             }
         });
     });

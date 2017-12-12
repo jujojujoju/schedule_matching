@@ -14,17 +14,31 @@ function isLogin(req, res, next) {
 
 router.get('/', isLogin, function (req, res, next) {
     var data = {
-        results: null
+        id:req.session.info.userid,
+        flag : 0
     };
-    db_.getMessages(function (results) {
-        console.log(results);
-        if (results == undefined || results == null) {
+    db_.getMessages(data, function (receivedmessages) {
+        console.log(receivedmessages);
+        if (receivedmessages == undefined || receivedmessages == null) {
             console.log("result is undefined")
         }
         else {
             console.log("get message list complete");
-            data.results = results;
-            res.render('messages', data);
+            data.receivedmessages = receivedmessages;
+            data.flag = 1;
+            db_.getMessages(data, function (sendedmessages) {
+                console.log(sendedmessages);
+                if (sendedmessages == undefined || sendedmessages == null) {
+                    console.log("result is undefined")
+                }
+                else {
+                    console.log("get message list complete");
+                    data.sendedmessages = sendedmessages;
+                    res.render('messages', data);
+                }
+            });
+
+            // res.render('messages', data);
         }
     });
 
