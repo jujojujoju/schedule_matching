@@ -719,9 +719,9 @@ module.exports.getWeekSchedule = function (ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT CLASSID,CLASSNAME,PROFNAME,DAY,STARTTIME,ENDTIME,CLASSLOC "+
-                    "FROM((SELECT * FROM( CLASS NATURAL JOIN USER_CLASS) WHERE USERID ="+ ID+
-            ") A NATURAL JOIN CLASS_TIME) ORDER BY CLASSID ASC, DAY DESC";
+                var query = "SELECT CLASSID,CLASSNAME,PROFNAME,DAY,STARTTIME,ENDTIME,CLASSLOC " +
+                    "FROM((SELECT * FROM( CLASS NATURAL JOIN USER_CLASS) WHERE USERID =" + ID +
+                    ") A NATURAL JOIN CLASS_TIME) ORDER BY CLASSID ASC, DAY DESC";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -738,11 +738,14 @@ module.exports.getWeekSchedule = function (ID, callback) {
                             });
 
 
+                        }
+                    })
+            }
+        })
+    })
+}
 
-
-};
-
-                  module.exports.writepost = function (data, callback) {
+module.exports.writepost = function (data, callback) {
 
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
