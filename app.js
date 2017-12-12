@@ -20,7 +20,7 @@ var users = require('./routes/users');
 var classes = require('./routes/class');
 var group = require('./routes/group');
 var app = express();
-
+var message = require('./routes/message');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -45,6 +45,7 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/class', classes);
 app.use('/group', group);
+app.use('/messages', message);
 var port = 9898;
 app.set('port', port);
 

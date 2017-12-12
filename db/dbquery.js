@@ -287,8 +287,8 @@ module.exports.createGroup = function (data, callback) {
                         if (err) {
                             callback(err);
                         } else {
-                            query = "SELECT * FROM (SELECT * FROM GRP WHERE GROUPNAME = '" + data.groupname +"' ORDER BY GROUPID DESC) WHERE ROWNUM = 1";
-                            statement.executeQuery(query,function (err, resultset) {
+                            query = "SELECT * FROM (SELECT * FROM GRP WHERE GROUPNAME = '" + data.groupname + "' ORDER BY GROUPID DESC) WHERE ROWNUM = 1";
+                            statement.executeQuery(query, function (err, resultset) {
                                 if (err) {
                                     console.log(err);
                                     db_init.release(connObj, function () {
@@ -310,3 +310,62 @@ module.exports.createGroup = function (data, callback) {
     });
 
 };
+
+module.exports.getMessages = function (callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT * FROM MESSAGES";
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    });
+            }
+        });
+    });
+};
+
+module.exports.sendMessage = function (data, callback) {
+
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                console.log(err);
+                callback(err);
+            } else {
+                var query = "INSERT INTO MESSAGES VALUES (message_seq.nextval, "
+                    + data.sender + ", " + data.receiver + ", '"
+                    + data.contents + "', sysdate)";
+                console.log(query);
+                statement.executeUpdate(query,
+                    function (err, count) {
+                        if (err) {
+                            console.log(err);
+                            callback(err);
+                        } else {
+                            callback(null, count);
+                        }
+                    });
+            }
+        });
+    });
+};
+

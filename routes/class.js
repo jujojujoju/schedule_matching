@@ -69,8 +69,6 @@ router.post('/getsch', function (req, res, next) {
 });
 
 
-
-
 module.exports = router;
 
 

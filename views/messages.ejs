@@ -1,0 +1,60 @@
+<% include header.ejs %>
+
+<style>
+    .messageform{
+        position: fixed;
+        width: 20%;
+        height: 65%;
+        margin-left: 65%;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+</style>
+<body>
+<div class="container" style="width: 50%; margin-left: 10%;">
+    <table class="table table-bordered table-hover">
+        <tr>
+            <th>번호</th>
+            <th>보낸 이</th>
+            <th>받는 이</th>
+            <th>보낸날짜</th>
+        </tr>
+        <%
+        for(var i = 0; i < results.length; i++)
+        {
+        %>
+        <tr>
+            <td><%= i + 1 %></td>
+            <td><%= results[i].SENDERID %></td>
+            <td><%= results[i].RECEIVERID %></td>
+            <td><%= results[i].SENDTIME %></td>
+        </tr>
+        <%
+        }
+        %>
+    </table>
+</div>
+<div>
+    <form class="messageform" method="post" action="/messages/send">
+        <div class="form-group">
+            <label>받을 사람</label>
+            <input type="text" class="form-control" id="receiverid" name="receiverid" placeholder="To...">
+        </div>
+        <div class="form-group">
+            <label>내용</label>
+            <input type="text" style="line-height: 150%" class="form-control" id="contents" name="contents" placeholder="contents">
+        </div>
+        <button type="submit" class="btn btn-default" >Submit</button>
+    </form>
+    <!--<button type="button" class="btn btn-danger" onclick="sendMessage()">쪽지 보내기</button>-->
+</div>
+</body>
+
+<script type="text/javascript">
+    function sendMessage() {
+
+//        location.href = "/group/?id=" + id + "&name=" + name;
+    }
+</script>
+
+</html>

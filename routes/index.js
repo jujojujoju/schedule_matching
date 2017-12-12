@@ -199,11 +199,7 @@ router.post('/login', isNotLogin, function (req, res, next) {
     ;
 });
 
-/*
- router.get('/class/:classid', isLogin, function (req, res, next) {
- var params = url.parse(req.url, true).query;
- }
- */
+
 
 
 module.exports = router;

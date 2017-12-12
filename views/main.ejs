@@ -30,7 +30,7 @@
         %>
         <tr>
             <td><%= i + 1 %></td>
-            <td><a onclick="moveToChat(<%= results[i].GROUPID %>, '<%= results[i].GROUPNAME %>')"><%= results[i].GROUPNAME %></a></td>
+            <td><a onclick="moveToChat('<%= results[i].GROUPID %>', '<%= results[i].GROUPNAME %>')"><%= results[i].GROUPNAME %></a></td>
             <td><%= results[i].NAME %></td>
             <td><%= results[i].CREATEDATE %></td>
         </tr>
@@ -42,6 +42,7 @@
     <div>
         <button type="button" class="btn btn-danger" onclick="createGroup()">그룹페이지 생성</button>
         <button type="button" class="btn btn-danger" onclick="moveToClass()">수업페이지 이동</button>
+        <button type="button" class="btn btn-danger" onclick="moveToMessages()">쪽지함으로 이동</button>
     </div>
 
 </div>
@@ -64,6 +65,9 @@
             console.log("그룹생성완료")
             location.href = "/group/create/?name=" + groupname;
         }
+    }
+    function moveToMessages() {
+        location.href = "/messages"
     }
 </script>
 
