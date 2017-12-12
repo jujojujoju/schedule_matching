@@ -39,7 +39,21 @@ router.get('/', isNotLogin, function (req, res, next) {
 });
 
 router.get('/main', isLogin, function (req, res, next) {
-    res.render('main', req.session.info);
+    var data = {
+        results: null,
+        session: req.session.info
+    };
+    db_.getGroupList(function (results) {
+        console.log(results);
+        if (results == undefined || results == null) {
+            console.log("result is undefined")
+        }
+        else {
+            console.log("get group list complete");
+            data.results = results;
+            res.render('main', data);
+        }
+    });
     // res.render('weekTest');
     // res.render('calendarTest');
 });

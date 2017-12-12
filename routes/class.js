@@ -18,7 +18,6 @@ router.get('/', isLogin, function (req, res, next) {
             console.log(results[i].CLASSID + "   "+results[i].CLASSNAME);
         }
         console.log(results.length);
-        var a = results.length;
         data= {
             _class : results
         };

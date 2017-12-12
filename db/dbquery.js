@@ -84,7 +84,7 @@ module.exports.signup = function (input, callback) {
                                                 + input.classinfo.prof_time[key][count2].loc + "' " +
                                                 "from dual where not exists " +
                                                 "(select * from CLASS where classid= '"
-                                                + input.classinfo.classid[count1] + "' and day= '" + input.classinfo.prof_time[key][count2].day +"' )"
+                                                + input.classinfo.classid[count1] + "' and day= '" + input.classinfo.prof_time[key][count2].day + "' )"
                                             console.log(query);
                                             statement.executeUpdate(query,
                                                 function (err, c3) {
@@ -144,7 +144,7 @@ module.exports.getClassList_distinct = function (ID, callback) {
             } else {
                 var query = "SELECT DISTINCT CLASSID, CLASSNAME\n" +
                     "FROM CLASS\n" +
-                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID+")";
+                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID + ")";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -177,7 +177,7 @@ module.exports.getClassList = function (ID, callback) {
             } else {
                 var query = "SELECT CLASSID, CLASSNAME\n" +
                     "FROM CLASS\n" +
-                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID+")";
+                    "WHERE CLASSID IN (SELECT DISTINCT CLASSID FROM USER_CLASS WHERE USERID=" + ID + ")";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -208,7 +208,7 @@ module.exports.getClassInfo = function (CID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT * FROM CLASS WHERE CLASSID='" + CID+"' ORDER BY DAY DESC";
+                var query = "SELECT * FROM CLASS WHERE CLASSID='" + CID + "' ORDER BY DAY DESC";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -230,3 +230,83 @@ module.exports.getClassInfo = function (CID, callback) {
     });
 };
 
+module.exports.getGroupList = function (callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT G.GROUPID, G.GROUPNAME, U.NAME, G.CREATEDATE FROM GRP G JOIN USERS U ON G.LEADERID=U.USERID";
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    });
+            }
+        });
+    });
+
+};
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+module.exports.createGroup = function (data, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "INSERT INTO GRP VALUES (grp_seq.nextval, '" + data.groupname + "', " + data.leaderid + ", '" + getRandomColor() + "', sysdate)";
+                console.log(query);
+                statement.executeUpdate(query,
+                    function (err, count) {
+                        if (err) {
+                            callback(err);
+                        } else {
+                            query = "SELECT * FROM (SELECT * FROM GRP WHERE GROUPNAME = '" + data.groupname +"' ORDER BY GROUPID DESC) WHERE ROWNUM = 1";
+                            statement.executeQuery(query,function (err, resultset) {
+                                if (err) {
+                                    console.log(err);
+                                    db_init.release(connObj, function () {
+                                    });
+                                    callback(false);
+                                } else {
+                                    resultset.toObjArray(function (err, results) {
+                                        db_init.release(connObj, function (err) {
+                                            callback(results);
+                                        });
+                                    });
+                                }
+                            });
+
+                        }
+                    });
+            }
+        });
+    });
+
+};

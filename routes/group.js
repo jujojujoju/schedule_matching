@@ -16,24 +16,33 @@ router.get('/', isLogin, function (req, res, next) {
     var params = url.parse(req.url, true).query;
     console.log(params['id']);
 
-    var data = {
-        chatid: params['id'],
+    var renderData = {
+        groupid: params['id'],
+        groupname: params['name'],
         session: req.session.info
     };
 
-    res.render('chat', data);
+    res.render('chat', renderData);
 });
 
 router.get('/create', isLogin, function (req, res, next) {
     var params = url.parse(req.url, true).query;
-    console.log(params['id']);
-
-    var data = {
-        chatid: params['id'],
-        session: req.session.info
+    var inputData = {
+        groupname: params['name'],
+        leaderid: req.session.info.userid
     };
+    db_.createGroup(inputData, function (results) {
+        console.log("create group complete");
+        console.log(results);
+        var renderData = {
+            groupid: results[0].GROUPID,
+            groupname: params['name'],
+            session: req.session.info
+        };
+        res.render('chat', renderData);
 
-    res.render('chat', data);
+    });
+
 });
 
 module.exports = router;

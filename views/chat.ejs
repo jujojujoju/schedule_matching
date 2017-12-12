@@ -38,7 +38,8 @@
 <script>
     var username = '<%= session.userName %>';
     var userID = '<%= session.userid %>';
-    var roomName = '<%= chatid %>';
+    var roomID = '<%= groupid %>';
+    var roomname = '<%= groupname %>';
 //    if (username == '오영택' || username == '조주영') {
 //        roomName = 'test1'
 //    } else {
@@ -48,19 +49,17 @@
     var users = []
     $(function () {
         $("#m").focus();
-        socket.emit('joinRoom', roomName);
+        socket.emit('joinRoom', roomID);
         socket.on('msgAlert', function (msg) {
             $('#messages').append($('<li>').text(msg));
         });
-
         socket.on('heartbeat', function (msg, room_id, roomlength, roommemberlist, roomidlist) {
             $('#broadcast').html("공지 : " + msg)
-            $('#roominfo').html("이 방은 " + room_id + " 입니다")
+            $('#roominfo').html("이 방의 아이디는 " + room_id + "이고 이름은" + roomname + " 입니다")
             users = roomidlist;
             $('#members').html("이 방의 멤버들은 " + roommemberlist + " 입니다")
             $('#length').html("이 방의 멤버숫자는  " + roomlength + " 입니다")
-        })
-
+        });
         $('#messageForm').submit(function () {
             if ($('#m').val() != '') {
                 socket.emit('sendMsg', $('#m').val());
@@ -68,7 +67,6 @@
             }
             return false;
         });
-
     });
     function getClassList() {
         for (var i = 0; i < users.length; i++) {
@@ -83,12 +81,8 @@
                     }
                 }
             });
-
         }
-
     }
-
-
 </script>
 
 
