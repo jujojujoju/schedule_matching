@@ -18,6 +18,7 @@ var db_init = require('./db/db_init');
 var index = require('./routes/index');
 var users = require('./routes/users');
 var classes = require('./routes/class');
+var group = require('./routes/group');
 var app = express();
 
 
@@ -43,6 +44,7 @@ app.use(session({
 app.use('/', index);
 app.use('/users', users);
 app.use('/class', classes);
+app.use('/group', group);
 var port = 9898;
 app.set('port', port);
 

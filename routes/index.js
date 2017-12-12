@@ -131,6 +131,20 @@ router.post('/login', isNotLogin, function (req, res, next) {
                             classname: classnameArray,
                             prof_time: prof_time
                         };
+                        router.get('/', isLogin, function (req, res, next) {
+                            var data;
+                            db_.getClassList_distinct(req.session.info.userid, function (results) {
+                                for (var i = 0; i < results.length; i++) {
+                                    console.log(results[i].CLASSID + "   " + results[i].CLASSNAME);
+                                }
+                                console.log(results.length);
+                                var a = results.length;
+                                data = {
+                                    _class: results
+                                };
+                                res.render('class', data);
+                            })
+                        });
 
                         if (userName != null) {
                             req.session.info = userinfo;
@@ -171,16 +185,10 @@ router.post('/login', isNotLogin, function (req, res, next) {
     ;
 });
 
-
-router.get('/chat', isLogin, function (req, res, next) {
-    res.render('chat', req.session.info);
-});
-
-
 /*
-router.get('/class/:classid', isLogin, function (req, res, next) {
-    var params = url.parse(req.url, true).query;
-}
+ router.get('/class/:classid', isLogin, function (req, res, next) {
+ var params = url.parse(req.url, true).query;
+ }
  */
 
 

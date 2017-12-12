@@ -6,13 +6,13 @@
 <body>
 
 <div class="container">
-    <h5><%= userid %></h5>
+    <h5><%= session.userid %></h5>
     <br><br>
-    <h5><%= userName %></h5>
+    <h5><%= session.userName %></h5>
     <br><br>
-    <h5><%= major %></h5>
+    <h5><%= session.major %></h5>
     <br><br>
-    <h5><%= degree %> 학년</h5>
+    <h5><%= session.degree %> 학년</h5>
     <h5 id="broadcast"></h5>
     <h5 id="roominfo"></h5>
     <h5 id="length"></h5>
@@ -36,14 +36,14 @@
 </body>
 
 <script>
-    var username = '<%= userName %>';
-    var userID = '<%= userid %>'
-    var roomName = "";
-    if (username == '오영택' || username == '조주영') {
-        roomName = 'test1'
-    } else {
-        roomName = 'test2'
-    }
+    var username = '<%= session.userName %>';
+    var userID = '<%= session.userid %>';
+    var roomName = '<%= chatid %>';
+//    if (username == '오영택' || username == '조주영') {
+//        roomName = 'test1'
+//    } else {
+//        roomName = 'test2'
+//    }
     var socket = io.connect(window.location.origin);
     var users = []
     $(function () {

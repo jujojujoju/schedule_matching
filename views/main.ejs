@@ -14,8 +14,29 @@
         <h1><%= degree %></h1>
         <br><br>
     </div>
+    <form>
+
+    </form>
+    <table class="table table-bordered table-hover">
+        <tr>
+            <th>번호</th>
+            <th>그룹이름</th>
+        </tr>
+        <%
+        for(var i = 1; i < 4; i++)
+        {
+        %>
+        <tr>
+            <td><%= i %></td>
+            <td><a onclick="moveToChat(<%= i %>)"><%= i %></a></td>
+        </tr>
+        <%
+        }
+        %>
+    </table>
+
     <div>
-        <button type="button" class="btn btn-danger" onclick="moveToChat()">그룹페이지 이동</button>
+        <button type="button" class="btn btn-danger" onclick="createGroup()">그룹페이지 생성</button>
         <button type="button" class="btn btn-danger" onclick="moveToClass()">수업페이지 이동</button>
     </div>
 
@@ -24,14 +45,21 @@
 </body>
 
 <script type="text/javascript">
-    function moveToChat() {
-        location.href = "/chat";
+    function moveToChat(id) {
+        location.href = "/group/?id=" + id;
     }
     function logout() {
         location.href = "/logout";
     }
-    function moveToClass(){
+    function moveToClass() {
         location.href = "/class";
+    }
+    function createGroup() {
+        var newid = prompt("그룹 이름 입력");
+        if (newid != null) {
+            console.log("그룹생성완료")
+            location.href = "/group/create/?id=" + newid;
+        }
     }
 </script>
 
