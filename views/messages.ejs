@@ -8,7 +8,7 @@
     }
 </style>
 <body>
-<div class="container">
+<div class="container" style="margin-top: 10%">
     <div class="row">
         <div class="col-xs-8">
             <!--<div  style="width: 50%; margin-left: 10%;">-->
@@ -18,7 +18,7 @@
                     <tr>
                         <th>번호</th>
                         <th>보낸 이</th>
-                        <!--<th>받는 이</th>-->
+                        <th>내용</th>
                         <th>보낸날짜</th>
                     </tr>
                     <%
@@ -30,6 +30,7 @@
                         <td>
                             <a onclick="resendMessage('<%= receivedmessages[i].SENDERID %>')"><%= receivedmessages[i].SENDERID %></a>
                         </td>
+                        <td><%= receivedmessages[i].CONTENTS %></td>
                         <td><%= receivedmessages[i].SENDTIME %></td>
                     </tr>
                     <%
@@ -43,8 +44,8 @@
                     보낸 메세지
                     <tr>
                         <th>번호</th>
-                        <!--<th>보낸 이</th>-->
                         <th>받는 이</th>
+                        <th>내용</th>
                         <th>보낸날짜</th>
                     </tr>
                     <%
@@ -56,6 +57,7 @@
                         <td>
                             <a onclick="resendMessage('<%= sendedmessages[i].RECEIVERID %>')"><%= sendedmessages[i].RECEIVERID %></a>
                         </td>
+                        <td><%= receivedmessages[i].CONTENTS %></td>
                         <td><%= sendedmessages[i].SENDTIME %></td>
                     </tr>
                     <%
@@ -79,33 +81,15 @@
             </form>
         </div>
     </div>
-
 </div>
 </body>
 
 <script type="text/javascript">
-    function resendMessage(id) {
+    function resendMessage(id, contents) {
+//        alert(contents);
         $("#receiverid").focus();
         $("#receiverid").val(id);
         $("#contents").val('');
-
-//        var groupname = prompt("메세지 내용입력");
-//        if (groupname != null) {
-//            console.log("메세지완료")
-//            location.href = "/group/create/?name=" + groupname;
-//        }
-
-//        $.ajax({
-//            url: '/class/getsch',
-//            type: 'POST',
-//            data: {userIDs: users[i]},
-//            success: function (result) {
-//                for (var i = 0; i < result.length; i++) {
-//                    $('#classes').append($('<li>').text(result[i].CLASSID + result[i].CLASSNAME));
-//                    console.log("" + result[i].CLASSID + "" + result[i].CLASSNAME)
-//                }
-//            }
-//        });
     }
 </script>
 

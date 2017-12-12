@@ -10,6 +10,7 @@
 <li>캘린더나왔다능!</li>
 <script>
     var ls = <%- JSON.stringify(list) %>;
+
     <!--console.log(lt)-->
     <!--console.log(le)-->
 
@@ -73,10 +74,9 @@
 
             },
             eventRender: function (event, element) {
+                console.log("===================================="+event);
                 element.attr('href', 'javascript:void(0);');
                 element.click(function() {
-//                    alert(event.end);
-//                    return ;
                     console.log(event.start);
                     $("#startTime").html(moment(event.start).format('MMM Do h:mm A'));
                     if(event.end == null) {
@@ -86,11 +86,13 @@
                     $("#endTime").html(moment(event.end).format('MMM Do h:mm A'));
                     }
 
+
                     $("#eventContent").dialog({ modal: true, title: event.title, id:event.id, width:400,
                     buttons:[{
                         text : "update",
                         icon: "ui-icon-heart",
                         click: function(event_title,event_id) {
+
                             //alert("update 누름");
                             var abc = prompt('Enter Title');
                             console.log(event_title,event_id);
@@ -112,7 +114,6 @@
                         text : "delete",
                         icon: "ui-icon-heart",
                         click: function() {
-                            //alert("delete 누름");
                             removeEvent(event.id, function(success) {
                                 console.log("removeEvent 들어옴");
                                 if (success){

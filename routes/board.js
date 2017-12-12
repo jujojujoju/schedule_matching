@@ -13,19 +13,6 @@ function isLogin(req, res, next) {
 }
 
 router.get('/', function (req, res, next) {
-    // var page = req.params.page;
-    // page = parseInt(page, 10);
-    // db_.getBoardList(page, function (data) {
-    //     data['isLogin'] = req.session.info != undefined;
-    //     if (data) {
-    //         console.log("get list ok");
-    //         console.log("date");
-            // res.render('board/list', data);
-        // } else {
-        //     console.log('result error');
-        // }
-    // });
-
     var boardflag = 'group';
     if (boardflag == 'group') {
         var data = {
@@ -36,6 +23,8 @@ router.get('/', function (req, res, next) {
             if (result) {
                 console.log("get list ok");
                 console.log("date");
+                // data.results = result;
+                result.groupid = data.groupid;
                 res.render('board',result)
             } else {
                 console.log('result error');
