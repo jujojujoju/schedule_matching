@@ -6754,4 +6754,35 @@ button.close {
     display: none !important;
   }
 }
+input[type=text], input[type=password] {
+  text-align: center;
+  width: 100%;
+  padding: 10px 10px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+h6{
+  font-size: 44px;
+  text-align: center;
+  font-style: italic;
+  color: #b92c28;
+}
+button[type=submit] {
+  background-color: #f2f2f2;
+  color: green;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+
+}
+
+/* Add padding to containers */
+.container {
+  padding: 10px;
+}
 /*# sourceMappingURL=bootstrap.css.map */

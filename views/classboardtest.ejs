@@ -6,25 +6,25 @@
         overflow-x: hidden;
         overflow-y: auto;
     }
-    .panel-success {
+    .panel-success{
         width: 777px;
         height: 300px;
         top: 0;
         bottom: 0;
         margin: 0;
     }
+
 </style>
 <body>
 
-<div class="container">
-    <div class="row" style="padding-bottom: 10%">
-        <ul class="nav nav-pills nav-justified">
-            <li><h3 class="glyphicon glyphicon-pencil"> <%= class_info.c_Name %></h3></li>
-            <li><h3 class="glyphicon glyphicon-user"> <%= class_info.c_Prof %></h3></li>
-            <li><h3 class="glyphicon glyphicon-time"> <%= class_info.c_Day %></h3></li>
-            <li><h3> <%= class_info.c_Time %></h3></li>
-        </ul>
-    </div>
+<% if(!isgroup)  { %>
+<div>
+    <h2><%= class_info.c_Name %></h2>
+    <h3><%= class_info.c_Prof %></h3>
+    <h3><%= class_info.c_Day %> <%= class_info.c_Time %></h3>
+</div>
+<% } %>
+<div class="container" style="margin-top: 10%">
     <div class="row">
         <div class="panel panel-success">
             <div class="panel-heading">
@@ -50,7 +50,7 @@
                 for(var i = 0; i < results.length; i++)
                 {
                 %>
-                <tr href="#" onclick="view('<%= results[i].PTI %>', '<%= results[i].PCO %>', '<%= results[i].PW %>')">
+                <tr onclick="view('<%= results[i].PTI %>', '<%= results[i].PCO %>', '<%= results[i].PW %>')">
                     <td><%= i + 1 %></td>
                     <td><%= results[i].PTI %></td>
                     <td><%= results[i].PW %></td>
@@ -60,24 +60,48 @@
                 }
                 %>
             </table>
+            <div style="text-align: center">
+                <% if(page > pageSize) { %>
+                [ <a href="/board/list/1" style="text-decoration: none;">◀◀</a> ]
+                [ <a href="/board/list/<%= startPage - 1 %>" style="text-decoration: none;">◀</a> ]
+                <% } else { %>
+                [ <span style="color:gray">◀◀</span> ]
+                [ <span style="color:gray">◀</span> ]
+                <% } %>
+                &nbsp;&nbsp;
+                <% for (var i = startPage; i <= endPage; i++) { %>
+                <% if (i == page) { %>
+                [ <%= i %> ]
+                <% } else { %>
+                [ <a href="/board/list/<%= i %>" style="text-decoration: none;"><%= i %></a> ]
+                <% } %>
+                <% } %>
+                &nbsp;&nbsp;
+                <% if (endPage < totalPage) { %>
+                [ <a href="/board/list/<%= endPage + 1 %>" style="text-decoration: none;">▶</a> ]
+                [ <a href="/board/list/<%= totalPage %>" style="text-decoration: none;">▶▶</a> ]
+                <% } else { %>
+                [ <span style="color:gray">▶</span> ]
+                [ <span style="color:gray">▶▶</span> ]
+                <% } %>
+            </div>
         </div>
         <div class="col-xs-4">
 
-            <form class="messageform" method="post" action="/class/write">
+            <form class="messageform" method="post" action="/board/write">
                 <div class="form-group">
                     <label>제목</label>
                     <input type="text" class="form-control" id="title" name="title" placeholder="title">
                 </div>
                 <div class="form-group">
                     <label>내용</label>
-                    <textarea style="border: 1px solid #f2f2f2; border-radius:5px;"rows="10" cols="50" class="form-control" id="contents" name="contents"
+                    <textarea rows="10" cols="50" class="form-control" id="contents" name="contents"
                               placeholder="Contents"></textarea>
                 </div>
                 <input type="hidden" name="boardid" value="<%= boardid %>">
-                <input type="hidden" name="classid" value="<%= class_info.c_id %>">
-
                 <button type="submit" class="btn btn-default">Submit</button>
             </form>
+
         </div>
     </div>
 </div>
