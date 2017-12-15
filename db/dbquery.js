@@ -232,7 +232,8 @@ module.exports.getClassInfo = function (CID, USERID, callback) {
                     "NATURAL JOIN " +
                     "(SELECT * " +
                     "FROM CLASS_TIME) B)C " +
-                    "WHERE C.CLASSID = '" + CID + "'";
+                    "WHERE C.CLASSID = '" + CID + "'\n"+
+                    "ORDER BY DAY DESC";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -653,7 +654,7 @@ module.exports.addEvent = function (event_info, user_id, callback) {
             } else {
                 var s = "INSERT INTO EVENTS VALUES(EVENT_SEQ.nextval,'" +
                     event_info.title + "',TO_DATE('" + event_info.start + "')," +
-                    "TO_DATE('" + event_info.end + "'),\'asd\',\'red\',\'P\'," + user_id + ")";
+                    "TO_DATE('" + event_info.end + "')+"+1+",\'asd\','"+event_info.backgroundColor+"','"+event_info.type+"'," + user_id + ")";
                 console.log(s);
                 statement.executeUpdate(s,
                     function (err, count) {
@@ -927,8 +928,40 @@ module.exports.getGroupCalendar = function (G_ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\""+
-                    "FROM EVENTS WHERE PG_ID ="+G_ID;
+                var query = "SELECT EVENT_ID AS \"id\", TITLE AS \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\"\n"+
+                    "FROM EVENTS\n"+
+                    "WHERE PG_ID = "+G_ID;
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    });
+            }
+        });
+    });
+};
+
+module.exports.getGroupColor = function (G_ID, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT GROUPCOLOR FROM GRP WHERE GROUPID="+G_ID;
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {

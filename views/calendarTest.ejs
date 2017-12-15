@@ -37,7 +37,8 @@
                 newEvent.start = moment(start).format();
                 newEvent.end = moment(start).format();
                 newEvent.backgroundColor = 'red';
-                newEvent.allDay = true  ;
+                newEvent.allDay = true ;
+                newEvent.type = 'P';
                 //newEvent.editable = true;
 
                 addEvent(newEvent, function(success) {
