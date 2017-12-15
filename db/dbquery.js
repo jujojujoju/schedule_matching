@@ -897,3 +897,76 @@ module.exports.chkLeader = function (G_ID,U_ID, callback) {
         })
     })
 }
+
+module.exports.getGroupPeopleWeek = function (G_ID, callback) {
+    console.log("getGroupPeopleWeek들어옴");
+    db_init.reserve(function (connObj) {
+        console.log("reserve들어옴");
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            console.log("createStatement들어옴");
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT CLASSID, CLASSNAME, PROFNAME, DAY, STARTTIME, ENDTIME, CLASSLOC\n"+
+                "FROM ((SELECT *\n" +
+                    "FROM (CLASS NATURAL JOIN USER_CLASS)\n"+
+                "WHERE USERID IN (SELECT USERID\n"+
+                "FROM USER_GROUP\n" +
+                "WHERE GROUPID =" + G_ID+")) A NATURAL JOIN CLASS_TIME)\n"+
+                "ORDER BY CLASSID ASC, DAY DESC";
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    })
+            }
+        })
+    })
+}
+
+module.exports.getGroupCalendar = function (G_ID, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\""+
+                    "FROM EVENTS WHERE PG_ID ="+G_ID;
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    });
+            }
+        });
+    });
+};
+

@@ -91,6 +91,78 @@ router.post('/getsch', function (req, res, next) {
     });
 });
 
+router.get('/schedule', isLogin, function (req, res, next) {
+    var params = url.parse(req.url, true).query;
+    var g_id = params['id'];//그룹아이디
+    console.log("그룹 아이디 : " + g_id);
+    //그룹아이디를 이용해서 그룹원들 아이디를 뽑고
+    //뽑은 그룹원들의 아이디를 이용해서 각 스케줄을 뽑아서 합친후에
+    //위클리 스케줄로 넘겨준다. 이때 집합으로 만들어야함(중복없이)
+    var data = [];
+    db_.getGroupPeopleWeek(g_id,function(results){
+        console.log("get group people week schedule success");
+        console.log("group people schedule set!!!!!!!!!!!!!!!!!!!!!!");
+        for(var i = 0 ; i < results.length ; i++){
+            var temp = {};
+            temp.dow = [];
+            if(results[i].DAY =='월'){
+                temp.dow.push(1);
+            }
+            if(results[i].DAY =='화'){
+                temp.dow.push(2);
+            }
+            if(results[i].DAY =='수'){
+                temp.dow.push(3);
+            }
+            if(results[i].DAY =='목'){
+                temp.dow.push(4);
+            }
+            if(results[i].DAY =='금'){
+                temp.dow.push(5);
+            }
+
+            temp.title = results[i].CLASSNAME;
+            temp.description = results[i].CLASSID +"\n"+results[i].PROFNAME+"\n"+results[i].CLASSLOC+"\n";
+            temp.start = results[i].STARTTIME;
+            temp.end = results[i].ENDTIME;
+            data.push(temp);
+        }
+        console.log("최종데이터!!!!!!!!!!!!!!!!1")
+        console.log(data);
+        var obj = {
+            list : data,
+            title : req.session.info.userid
+        }
+        res.render('weekTest',obj);
+    })
+
+});
+
+router.get('/calendar', isLogin, function (req, res, next) {
+    var params = url.parse(req.url, true).query;
+    var g_id = params['id'];//그룹아이디
+    console.log("그룹 아이디 : " + g_id);
+    //그룹아이디를 이용해서 그룹원들 아이디를 뽑고
+    //뽑은 그룹원들의 아이디를 이용해서 각 스케줄을 뽑아서 합친후에
+    //위클리 스케줄로 넘겨준다. 이때 집합으로 만들어야함(중복없이)
+    var data = [];
+    db_.getGroupCalendar(g_id,function(results){
+        for(var i = 0 ; i < results.length;i++){
+            results[i].allDay = true;
+        }
+        console.log(results);
+
+        var obj = {
+            list : results
+        }
+
+        res.render('calendarTest',obj);
+    })
+
+});
+
+
+
 
 module.exports = router;
 

@@ -3,7 +3,7 @@ var router = express.Router();
 var url = require("url");
 var db_init = require('../db/db_init');
 var db_ = require("../db/dbquery");
-var moment = require('moment-timezone');
+//var moment = require('moment-timezone');
 function isLogin(req, res, next) {
     if (req.session.info != undefined) {
         next();
