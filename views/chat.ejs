@@ -26,7 +26,8 @@
                 </div>
                 <form id="messageForm" action="">
                     <input style=" padding: 10px; width: 80%;" id="m" autocomplete="off"/>
-                    <button onclick="entering()" class="btn btn-default" style="padding: 10px; width: 18%;">Send</button>
+                    <button onclick="entering()" class="btn btn-default" style="padding: 10px; width: 18%;">Send
+                    </button>
                 </form>
             </div>
         </div>
@@ -92,8 +93,22 @@
         }
     }
     function moveToBoard() {
-        console.assert(roomID)
-        location.href = '/board/?id='+roomID
+        var boardid = null
+        $.ajax({
+            url: '/board/getboardid',
+            type: 'POST',
+            data: {
+                id: roomID
+            },
+            success: function (result) {
+                var data = {
+                    boardid : result[0].BOARDID
+//                    flag : 'class'
+                }
+//                boardid = result[0].BOARDID
+                location.href = '/board/?id=' + data.boardid
+            }
+        });
     }
 </script>
 
