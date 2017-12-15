@@ -66,7 +66,8 @@ router.get('/', isLogin, function (req, res, next) {
         console.log("최종데이터!!!!!!!!!!!!!!!!1")
         console.log(data);
         var obj = {
-            list : data
+            list : data,
+            title : req.session.info.userid
         }
         res.render('weekTest',obj);
      });

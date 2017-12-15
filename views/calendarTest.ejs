@@ -16,13 +16,15 @@
 
     $(document).ready(function () {
         $('#calendar').fullCalendar({
+            height : $(window).height()/2 + 400,
+            width : $(window).width()/2,
             header: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'month,agendaWeek,agendaDay'
+               // right: 'month,agendaWeek,agendaDay'
             },
             events: ls,
-            editable: true,
+                editable: true,
             dayClick: function (start,allDay, jsEvent, view) {
                 var abc = prompt('Enter Title');
 //                var allDay = !start.hasTime && !end.hasTime;
@@ -78,64 +80,134 @@
                 element.attr('href', 'javascript:void(0);');
                 element.click(function() {
                     console.log(event.start);
-                    $("#startTime").html(moment(event.start).format('MMM Do h:mm A'));
-                    if(event.end == null) {
-                        $("#endTime").html(moment(event.start).format('MMM Do h:mm A'));
+                    console.log(event.description);
+                    if(event.description <999999999){
+                        isLeader(event.description,function(fact){
+                            if(!fact){
+                                alert("해당 그룹의 리더가 이닙니다.");
+                                return;
+                            }
+                            else{
+                                $("#startTime").html(moment(event.start).format('MMM Do h:mm A'));
+                                if(event.end == null) {
+                                    $("#endTime").html(moment(event.start).format('MMM Do h:mm A'));
+                                }
+                                else{
+                                    $("#endTime").html(moment(event.end).format('MMM Do h:mm A'));
+                                }
+
+
+                                $("#eventContent").dialog({ modal: true, title: event.title, id:event.id, width:400,
+                                    buttons:[{
+                                        text : "update",
+                                        icon: "ui-icon-heart",
+                                        click: function(event_title,event_id) {
+
+                                            //alert("update 누름");
+                                            var abc = prompt('Enter Title');
+                                            console.log(event_title,event_id);
+                                            //console.log(abc);
+                                            event.title = abc;
+                                            updateEvent(event, function(success) {
+                                                console.log("updateEvent(HTML) 들어옴");
+                                                if (success){
+                                                    $('#calendar').fullCalendar( 'updateEvent', event);
+                                                    $('#calendar').fullCalendar( 'refetchEvents');
+                                                    $('#calendar').fullCalendar('rerenderEvents');
+                                                }
+                                                else {
+                                                    alert("실패");
+                                                }
+                                            });
+                                            $( this ).dialog( "close" );
+                                        }},{
+                                        text : "delete",
+                                        icon: "ui-icon-heart",
+                                        click: function() {
+                                            removeEvent(event.id, function(success) {
+                                                console.log("removeEvent 들어옴");
+                                                if (success){
+                                                    $('#calendar').fullCalendar('removeEvents',event.id);
+                                                    $('#calendar').fullCalendar('addEventSource', event);
+                                                    $('#calendar').fullCalendar('rerenderEvents' );
+                                                }
+                                                else {
+                                                    alert("실패");
+                                                }
+                                            });
+                                            $( this ).dialog( "close" );
+                                        }
+                                    },{
+                                        text : "cancle",
+                                        icon: "ui-icon-heart",
+                                        click: function() {
+                                            //alert("cancle 누름");
+                                            $( this ).dialog( "close" );
+                                        }
+                                    }]});
+                            }
+                        })
                     }
                     else{
-                    $("#endTime").html(moment(event.end).format('MMM Do h:mm A'));
+                        $("#startTime").html(moment(event.start).format('MMM Do h:mm A'));
+                        if(event.end == null) {
+                            $("#endTime").html(moment(event.start).format('MMM Do h:mm A'));
+                        }
+                        else{
+                            $("#endTime").html(moment(event.end).format('MMM Do h:mm A'));
+                        }
+
+
+                        $("#eventContent").dialog({ modal: true, title: event.title, id:event.id, width:400,
+                            buttons:[{
+                                text : "update",
+                                icon: "ui-icon-heart",
+                                click: function(event_title,event_id) {
+
+                                    //alert("update 누름");
+                                    var abc = prompt('Enter Title');
+                                    console.log(event_title,event_id);
+                                    //console.log(abc);
+                                    event.title = abc;
+                                    updateEvent(event, function(success) {
+                                        console.log("updateEvent(HTML) 들어옴");
+                                        if (success){
+                                            $('#calendar').fullCalendar( 'updateEvent', event);
+                                            $('#calendar').fullCalendar( 'refetchEvents');
+                                            $('#calendar').fullCalendar('rerenderEvents');
+                                        }
+                                        else {
+                                            alert("실패");
+                                        }
+                                    });
+                                    $( this ).dialog( "close" );
+                                }},{
+                                text : "delete",
+                                icon: "ui-icon-heart",
+                                click: function() {
+                                    removeEvent(event.id, function(success) {
+                                        console.log("removeEvent 들어옴");
+                                        if (success){
+                                            $('#calendar').fullCalendar('removeEvents',event.id);
+                                            $('#calendar').fullCalendar('addEventSource', event);
+                                            $('#calendar').fullCalendar('rerenderEvents' );
+                                        }
+                                        else {
+                                            alert("실패");
+                                        }
+                                    });
+                                    $( this ).dialog( "close" );
+                                }
+                            },{
+                                text : "cancle",
+                                icon: "ui-icon-heart",
+                                click: function() {
+                                    //alert("cancle 누름");
+                                    $( this ).dialog( "close" );
+                                }
+                            }]});
                     }
-
-
-                    $("#eventContent").dialog({ modal: true, title: event.title, id:event.id, width:400,
-                    buttons:[{
-                        text : "update",
-                        icon: "ui-icon-heart",
-                        click: function(event_title,event_id) {
-
-                            //alert("update 누름");
-                            var abc = prompt('Enter Title');
-                            console.log(event_title,event_id);
-                            //console.log(abc);
-                            event.title = abc;
-                            updateEvent(event, function(success) {
-                                console.log("updateEvent(HTML) 들어옴");
-                                if (success){
-                                    $('#calendar').fullCalendar( 'updateEvent', event);
-                                    $('#calendar').fullCalendar( 'refetchEvents');
-                                    $('#calendar').fullCalendar('rerenderEvents');
-                                }
-                                else {
-                                    alert("실패");
-                                }
-                            });
-                            $( this ).dialog( "close" );
-                       }},{
-                        text : "delete",
-                        icon: "ui-icon-heart",
-                        click: function() {
-                            removeEvent(event.id, function(success) {
-                                console.log("removeEvent 들어옴");
-                                if (success){
-                                    $('#calendar').fullCalendar('removeEvents',event.id);
-                                    $('#calendar').fullCalendar('addEventSource', event);
-                                    $('#calendar').fullCalendar('rerenderEvents' );
-                                }
-                                else {
-                                    alert("실패");
-                                }
-                            });
-                            $( this ).dialog( "close" );
-                        }
-                    },{
-                        text : "cancle",
-                        icon: "ui-icon-heart",
-                        click: function() {
-                            //alert("cancle 누름");
-                            $( this ).dialog( "close" );
-                        }
-                    }]});
-                });
+                    });
 
             },
             eventDrop: function(event, delta, revertFunc) {
@@ -252,6 +324,42 @@
             }
         });
     }
+
+    function resizeUpdateEvent(obj,callback){
+        console.log("resizeUpdateEvent 함수안으로!들어옴", obj);
+        $.ajax({
+            url: '/calendar/update_resize',
+            type: 'POST',
+            data: { id : obj.id,
+                end : obj.end,
+                delta : obj.delta
+            },
+            success: function(data){
+                callback(true);
+            },
+            error: function(e){
+                callback(false);
+            }
+        });
+    }
+
+    function isLeader(obj,callback){
+        console.log("isLeader 함수안으로!들어옴", obj);
+        $.ajax({
+            url: '/calendar/isLeader',
+            type: 'POST',
+            data: { PG_ID : obj
+            },
+            success: function(data){
+                callback(true);
+            },
+            error: function(e){
+                callback(false);
+            }
+        });
+    }
+
+
 </script>
 
 <body>
@@ -263,8 +371,6 @@
     <div id="eventContent" title="Event Details" style="display:none;">
         Start: <span id="startTime"></span><br>
         End: <span id="endTime"></span><br><br>
-        <!--<p id="eventInfo"></p>-->
-        <!--<p><strong><a id="eventLink" href="" target="_blank">Read More</a></strong></p>-->
     </div>
 
 </div>

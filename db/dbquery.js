@@ -470,9 +470,10 @@ module.exports.getCalendar = function (ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" " +
-                    "FROM EVENTS " +
-                    "WHERE PG_ID =" + ID;
+                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\""+
+                    "FROM EVENTS WHERE (PG_ID IN (SELECT GROUPID "+
+                    "FROM USER_GROUP " +
+                    "WHERE USERID = "+ID+")) OR PG_ID = "+ID;
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -772,3 +773,39 @@ module.exports.writepost = function (data, callback) {
     });
 
 };
+
+module.exports.chkLeader = function (G_ID,U_ID, callback) {
+    console.log("getWeekSchedule들어옴");
+    db_init.reserve(function (connObj) {
+        console.log("reserve들어옴");
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            console.log("createStatement들어옴");
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT * FROM GRP WHERE GROUPID ="+G_ID + " AND LEADERID = "+U_ID;
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+
+
+                        }
+                    })
+            }
+        })
+    })
+}
