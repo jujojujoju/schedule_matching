@@ -464,10 +464,10 @@ module.exports.getCalendar = function (ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\""+
-                    "FROM EVENTS WHERE (PG_ID IN (SELECT GROUPID "+
+                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\"" +
+                    "FROM EVENTS WHERE (PG_ID IN (SELECT GROUPID " +
                     "FROM USER_GROUP " +
-                    "WHERE USERID = "+ID+")) OR PG_ID = "+ID;
+                    "WHERE USERID = " + ID + ")) OR PG_ID = " + ID;
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -810,11 +810,14 @@ module.exports.getboardid = function (data, callback) {
                 callback(false);
             } else {
                 var query;
-                if (typeof data === 'number')
-                    query = "SELECT BOARDID FROM BOARD WHERE GROUPID = " + data;
-                else
-                    query = "SELECT BOARDID FROM BOARD WHERE CLASSID = '" + data + "'";
-
+                if (data.isgroup) {
+                    query = "SELECT BOARDID FROM BOARD WHERE GROUPID = " + data.id;
+                    console.log(typeof data.id)
+                }
+                else {
+                    console.log(typeof data.id);
+                    query = "SELECT BOARDID FROM BOARD WHERE CLASSID = '" + data.id + "'";
+                }
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -843,7 +846,7 @@ module.exports.getboardid = function (data, callback) {
 
 };
 
-module.exports.chkLeader = function (G_ID,U_ID, callback) {
+module.exports.chkLeader = function (G_ID, U_ID, callback) {
     console.log("getWeekSchedule들어옴");
     db_init.reserve(function (connObj) {
         console.log("reserve들어옴");
@@ -855,7 +858,7 @@ module.exports.chkLeader = function (G_ID,U_ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT * FROM GRP WHERE GROUPID ="+G_ID + " AND LEADERID = "+U_ID;
+                var query = "SELECT * FROM GRP WHERE GROUPID =" + G_ID + " AND LEADERID = " + U_ID;
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -891,13 +894,13 @@ module.exports.getGroupPeopleWeek = function (G_ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT CLASSID, CLASSNAME, PROFNAME, DAY, STARTTIME, ENDTIME, CLASSLOC\n"+
-                "FROM ((SELECT *\n" +
-                    "FROM (CLASS NATURAL JOIN USER_CLASS)\n"+
-                "WHERE USERID IN (SELECT USERID\n"+
-                "FROM USER_GROUP\n" +
-                "WHERE GROUPID =" + G_ID+")) A NATURAL JOIN CLASS_TIME)\n"+
-                "ORDER BY CLASSID ASC, DAY DESC";
+                var query = "SELECT CLASSID, CLASSNAME, PROFNAME, DAY, STARTTIME, ENDTIME, CLASSLOC\n" +
+                    "FROM ((SELECT *\n" +
+                    "FROM (CLASS NATURAL JOIN USER_CLASS)\n" +
+                    "WHERE USERID IN (SELECT USERID\n" +
+                    "FROM USER_GROUP\n" +
+                    "WHERE GROUPID =" + G_ID + ")) A NATURAL JOIN CLASS_TIME)\n" +
+                    "ORDER BY CLASSID ASC, DAY DESC";
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -982,3 +985,27 @@ module.exports.getGroupColor = function (G_ID, callback) {
         });
     });
 };
+
+module.exports.insertingroup = function (data, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                console.log(err);
+                callback(err);
+            } else {
+                var query = "INSERT INTO USER_GROUP VALUES (" + data.userid + "," + data.groupid + ")";
+                console.log(query);
+                statement.executeUpdate(query,
+                    function (err, count) {
+                        if (err) {
+                            console.log(err);
+                            callback(err);
+                        } else {
+                            callback(count);
+                        }
+                    });
+            }
+        });
+    });
+}

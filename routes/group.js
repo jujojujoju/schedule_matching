@@ -11,7 +11,6 @@ function noCache(res) {
 }
 function isLogin(req, res, next) {
     noCache(res);
-
     if (req.session.info != undefined) {
         next();
     } else {
@@ -22,12 +21,38 @@ function isLogin(req, res, next) {
 router.get('/', isLogin, function (req, res, next) {
     var params = url.parse(req.url, true).query;
     console.log(params['id']);
-    var renderData = {
+    var data = {
+        page: 1,
+        isgroup : true,
+        id:params['id'],
         groupid: params['id'],
         groupname: params['name'],
         session: req.session.info
     };
-    res.render('chat', renderData);
+    db_.getboardid(data, function (result1) {
+        // res.send(result)
+        data.boardid = result1[0].BOARDID;
+        db_.getBoardList(data, function (result) {
+            if (result) {
+                console.log("get list ok");
+                var input ={
+                    userid : req.session.info.userid,
+                    groupid : data.groupid
+                };
+                db_.insertingroup(input, function (count) {
+                    if(count){
+                        result = Object.assign({}, data, result);
+                        // result.session = req.session.info
+                        res.render('chat', result);
+                    }
+                })
+
+            } else {
+                console.log('result error');
+            }
+        });
+    })
+
 });
 
 router.post('/create', isLogin, function (req, res, next) {
