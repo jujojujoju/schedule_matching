@@ -35,8 +35,9 @@
 
 
 </div>
-<button type="button" class="btn btn-danger" onclick="getClassList()">이방에 속한 모든사람 수업 가져오기</button>
+<button type="button" class="btn btn-danger" onclick="getClassList('<%= groupid %>')">이방에 속한 모든사람 수업 가져오기</button>
 <button type="button" class="btn btn-danger" onclick="moveToBoard()">게시판 가기</button>
+<button type="button" class="btn btn-danger" onclick="moveToGroupCalendar('<%= groupid %>')">그룹 달력 가기</button>
 
 
 </body>
@@ -77,21 +78,14 @@
             return false;
         });
     });
-    function getClassList() {
-        for (var i = 0; i < users.length; i++) {
-            $.ajax({
-                url: '/class/getsch',
-                type: 'POST',
-                data: {userIDs: users[i]},
-                success: function (result) {
-                    for (var i = 0; i < result.length; i++) {
-                        $('#classes').append($('<li>').text(result[i].CLASSID + result[i].CLASSNAME));
-                        console.log("" + result[i].CLASSID + "" + result[i].CLASSNAME)
-                    }
-                }
-            });
-        }
+    function getClassList(g_id) {
+        location.href = '/class/schedule/?id='+g_id;
     }
+
+    function moveToGroupCalendar(g_id){
+        location.href = '/class/calendar/?id='+g_id;
+    }
+
     function moveToBoard() {
         var boardid = null
         $.ajax({
@@ -110,6 +104,8 @@
             }
         });
     }
+
+
 </script>
 
 
