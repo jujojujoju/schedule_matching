@@ -60,7 +60,14 @@ router.get('/main', isLogin, function (req, res, next) {
         else {
             console.log("get group list complete");
             data.results = results;
-            res.render('main', data);
+            db_.getClassList_distinct(req.session.info.userid, function (classresult) {
+                for (var i = 0; i < classresult.length; i++) {
+                    console.log(classresult[i].CLASSID + "   " + classresult[i].CLASSNAME);
+                }
+                console.log(classresult.length);
+                data._class = classresult;
+                res.render('main', data);
+            });
         }
     });
     // res.render('weekTest');
