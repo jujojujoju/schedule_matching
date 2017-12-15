@@ -19,8 +19,23 @@
 
 <script type="text/javascript">
     function moveToCLASSPAGE(i) {
-        alert(i);
-        location.href = "/class/page/?cid="+i;
+        var boardid = null
+        $.ajax({
+            url: '/board/getboardid',
+            type: 'POST',
+            data: {
+                id: i
+            },
+            success: function (result) {
+                var data = {
+                    boardid : result[0].BOARDID
+//                    flag : 'class'
+                }
+//                location.href = '/board/?page=class&id='+data.boardid
+                location.href = "/class/page/?cid="+i+"&id=" +data.boardid;
+            }
+        });
+
     }
 </script>
 

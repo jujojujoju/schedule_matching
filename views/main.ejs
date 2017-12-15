@@ -14,9 +14,6 @@
         <h1><%= session.degree %></h1>
         <br><br>
     </div>
-    <form>
-
-    </form>
     <table class="table table-bordered table-hover">
         <tr>
             <th>번호</th>
@@ -61,7 +58,22 @@
 
 <script type="text/javascript">
     function moveToChat(id, name) {
-        location.href = "/group/?id=" + id + "&name=" + name;
+        var inputpassword = prompt("비밀번호 입력")
+        $.ajax({
+            url: '/group/grouppwd',
+            type: 'POST',
+            data: {
+                groupid: id,
+                password: inputpassword
+            },
+            success: function (result) {
+                if (result.isok)
+                    location.href = "/group/?id=" + id + "&name=" + name;
+                else{
+                    alert("로그인 실패")
+                }
+            }
+        });
     }
     function logout() {
         location.href = "/logout";
@@ -71,9 +83,20 @@
     }
     function createGroup() {
         var groupname = prompt("그룹 이름 입력");
+        var password = prompt("비밀번호 입력")
         if (groupname != null) {
             console.log("그룹생성완료")
-            location.href = "/group/create/?name=" + groupname;
+            $.ajax({
+                url: '/group/create',
+                type: 'POST',
+                data: {
+                    groupname: groupname,
+                    password: password
+                },
+                success: function (result) {
+                    location.href = "/group/?id=" + result.groupid + "&name=" + result.groupname;
+                }
+            });
         }
     }
     function moveToCalendar() {
@@ -83,15 +106,13 @@
     function moveToMessages() {
         location.href = "/messages"
     }
-
     function moveToBoard() {
         location.href = '/board'
-
     }
     function moveToSheduler() {
         location.href = '/scheduler'
-
     }
+
 </script>
 
 

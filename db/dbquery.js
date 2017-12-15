@@ -73,51 +73,61 @@ module.exports.signup = function (input, callback) {
                                             if (err) {
                                                 console.log(err);
                                             } else {
-                                                async.whilst(
-                                                    function () {
-                                                        return count2 < input.classinfo.prof_time[professor].length
-                                                    },
-                                                    function (c2) {
-                                                        query = "INSERT INTO CLASS_TIME SELECT class_time_seq.nextval, '" + input.classinfo.classid[count1] + "', '"
-                                                            + input.classinfo.prof_time[professor][count2].day + "','"
-                                                            + input.classinfo.prof_time[professor][count2].starttime + "','"
-                                                            + input.classinfo.prof_time[professor][count2].endtime + "','"
-                                                            + input.classinfo.prof_time[professor][count2].loc + "' "
-                                                            + "from dual where not exists "
-                                                            + "(select * from CLASS_TIME where classid= '"
-                                                            + input.classinfo.classid[count1] + "' and day= '" + input.classinfo.prof_time[professor][count2].day + "' )"
-                                                        console.log(query);
-                                                        statement.executeUpdate(query,
-                                                            function (err, c3) {
-                                                                if (err) {
-                                                                    console.log(err);
-                                                                } else {
-                                                                    query = "INSERT INTO USER_CLASS SELECT "
-                                                                        + input.userinfo.userid + ",'"
-                                                                        + input.classinfo.classid[count1]
-                                                                        + "' from dual where not exists (select * from USER_CLASS where userid="
-                                                                        + input.userinfo.userid + " " +
-                                                                        "and classid='" + input.classinfo.classid[count1] + "')";
+                                                query = "INSERT INTO BOARD (BOARDID, CLASSID)" +
+                                                    " VALUES (board_seq.nextval, '" + input.classinfo.classid[count1] + "' )";
+                                                statement.executeUpdate(query,
+                                                    function (err, c6) {
+                                                        if (err) {
+                                                            console.log(err);
+                                                        } else {
+
+                                                            async.whilst(
+                                                                function () {
+                                                                    return count2 < input.classinfo.prof_time[professor].length
+                                                                },
+                                                                function (c2) {
+                                                                    query = "INSERT INTO CLASS_TIME SELECT class_time_seq.nextval, '" + input.classinfo.classid[count1] + "', '"
+                                                                        + input.classinfo.prof_time[professor][count2].day + "','"
+                                                                        + input.classinfo.prof_time[professor][count2].starttime + "','"
+                                                                        + input.classinfo.prof_time[professor][count2].endtime + "','"
+                                                                        + input.classinfo.prof_time[professor][count2].loc + "' "
+                                                                        + "from dual where not exists "
+                                                                        + "(select * from CLASS_TIME where classid= '"
+                                                                        + input.classinfo.classid[count1] + "' and day= '" + input.classinfo.prof_time[professor][count2].day + "' )"
+                                                                    console.log(query);
                                                                     statement.executeUpdate(query,
-                                                                        function (err, c4) {
+                                                                        function (err, c3) {
                                                                             if (err) {
-                                                                                console.log(err)
+                                                                                console.log(err);
                                                                             } else {
-                                                                                console.log("insert complete");
-                                                                                count2++;
-                                                                                setTimeout(c2, 0);
+                                                                                query = "INSERT INTO USER_CLASS SELECT "
+                                                                                    + input.userinfo.userid + ",'"
+                                                                                    + input.classinfo.classid[count1]
+                                                                                    + "' from dual where not exists (select * from USER_CLASS where userid="
+                                                                                    + input.userinfo.userid + " " +
+                                                                                    "and classid='" + input.classinfo.classid[count1] + "')";
+                                                                                statement.executeUpdate(query,
+                                                                                    function (err, c4) {
+                                                                                        if (err) {
+                                                                                            console.log(err)
+                                                                                        } else {
+                                                                                            console.log("insert complete");
+                                                                                            count2++;
+                                                                                            setTimeout(c2, 0);
+                                                                                        }
+                                                                                    }
+                                                                                );
                                                                             }
                                                                         }
                                                                     );
+                                                                },
+                                                                function (err) {
+                                                                    count1++;
+                                                                    c1();
                                                                 }
-                                                            }
-                                                        );
-                                                    },
-                                                    function (err) {
-                                                        count1++;
-                                                        c1();
-                                                    }
-                                                );
+                                                            );
+                                                        }
+                                                    })
                                             }
                                         })
                                 },
@@ -293,7 +303,9 @@ module.exports.createGroup = function (data, callback) {
                 });
                 callback(false);
             } else {
-                var query = "INSERT INTO GRP VALUES (grp_seq.nextval, '" + data.groupname + "', " + data.leaderid + ", '" + getRandomColor() + "', sysdate)";
+                var query = "INSERT INTO GRP VALUES (grp_seq.nextval, '"
+                    + data.groupname + "', " + data.leaderid + ", '"
+                    + getRandomColor() + "', sysdate, '" + data.password + "')";
                 console.log(query);
                 statement.executeUpdate(query,
                     function (err, count) {
@@ -405,7 +417,7 @@ module.exports.getBoardList = function (data, callback) {
                             "pp.title pti, pp.content pco, pp.writer pw, pp.time pt " +
                             "FROM board bb JOIN posts pp " +
                             "ON bb.boardid = pp.boardid " +
-                            "WHERE bb.groupid = " + data.groupid + " ORDER BY bid DESC) " +
+                            "WHERE bb.boardid = " + data.boardid + " ORDER BY bid DESC) " +
                             "WHERE ROWNUM BETWEEN " + begin + " AND " + end;
                         statement.executeQuery(query, function (err, resultset) {
                             if (err) {
@@ -424,30 +436,31 @@ module.exports.getBoardList = function (data, callback) {
                                         pageSize: pageSize,
                                         startPage: startPage,
                                         endPage: endPage,
-                                        totalPage: totalPage
+                                        totalPage: totalPage,
+                                        boardid: data.boardid
                                     };
-                                    query = "SELECT BOARDID FROM BOARD WHERE GROUPID=" + data.groupid;
-                                    console.log(query);
-                                    statement.executeQuery(query, function (err, resultset) {
-                                        if (err) {
-                                            console.log(err);
-                                            console.log("Error before executeQuery");
-                                            db_init.release(connObj, function () {
-                                            });
-                                            callback(false);
-                                        } else {
-                                            resultset.toObjArray(function (err, results2) {
+                                    // query = "SELECT BOARDID FROM BOARD WHERE GROUPID=" + data.groupid;
+                                    // console.log(query);
+                                    // statement.executeQuery(query, function (err, resultset) {
+                                    //     if (err) {
+                                    //         console.log(err);
+                                    //         console.log("Error before executeQuery");
+                                    //         db_init.release(connObj, function () {
+                                    //         });
+                                    //         callback(false);
+                                    //     } else {
+                                    //         resultset.toObjArray(function (err, results2) {
 
-                                                db_init.release(connObj, function (err) {
-                                                    newdata.boardid = results2[0].BOARDID;
-                                                    // console.log(results2)
-                                                    // console.log(results2[0])
-                                                    console.log(results2)
-                                                    callback(newdata);
+                                    db_init.release(connObj, function (err) {
+                                        // newdata.boardid = results2[0].BOARDID;
+                                        // console.log(results2)
+                                        // console.log(results2[0])
+                                        // console.log(results2)
+                                        callback(newdata);
 
-                                                });
-                                            })
-                                        }
+                                        // });
+                                        // })
+                                        // }
                                     })
                                 });
                             }
@@ -746,7 +759,6 @@ module.exports.getWeekSchedule = function (ID, callback) {
 }
 
 module.exports.writepost = function (data, callback) {
-
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
         conn.createStatement(function (err, statement) {
@@ -770,5 +782,81 @@ module.exports.writepost = function (data, callback) {
             }
         });
     });
-
 };
+
+module.exports.chkgrouppwd = function (data, callback) {
+    db_init.reserve(function (connObj) {
+        console.log("reserve들어옴");
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            console.log("createStatement들어옴");
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT PASSWORD FROM GRP WHERE GROUPID = " + data.groupid;
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    })
+            }
+        })
+    })
+};
+
+module.exports.getboardid = function (data, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            console.log("createStatement들어옴");
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query;
+                if (typeof data === 'number')
+                    query = "SELECT BOARDID FROM BOARD WHERE GROUPID = " + data;
+                else
+                    query = "SELECT BOARDID FROM BOARD WHERE CLASSID = '" + data + "'";
+
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                if (err) {
+                                    console.log(err)
+                                } else {
+                                    console.log("==============" + results)
+                                    db_init.release(connObj, function (err) {
+                                        console.log(results[0].BOARDID)
+                                        callback(results);
+                                    });
+                                }
+                            });
+                        }
+                    })
+            }
+        })
+    })
+
+}
