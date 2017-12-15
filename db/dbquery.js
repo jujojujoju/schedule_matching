@@ -463,9 +463,10 @@ module.exports.getCalendar = function (ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" " +
-                    "FROM EVENTS " +
-                    "WHERE PG_ID =" + ID;
+                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\""+
+                    "FROM EVENTS WHERE (PG_ID IN (SELECT GROUPID "+
+                    "FROM USER_GROUP " +
+                    "WHERE USERID = "+ID+")) OR PG_ID = "+ID;
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -839,4 +840,112 @@ module.exports.getboardid = function (data, callback) {
         })
     })
 
+};
+
+module.exports.chkLeader = function (G_ID,U_ID, callback) {
+    console.log("getWeekSchedule들어옴");
+    db_init.reserve(function (connObj) {
+        console.log("reserve들어옴");
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            console.log("createStatement들어옴");
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT * FROM GRP WHERE GROUPID ="+G_ID + " AND LEADERID = "+U_ID;
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+
+
+                        }
+                    })
+            }
+        })
+    })
+}
+
+module.exports.getGroupPeopleWeek = function (G_ID, callback) {
+    console.log("getGroupPeopleWeek들어옴");
+    db_init.reserve(function (connObj) {
+        console.log("reserve들어옴");
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            console.log("createStatement들어옴");
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT CLASSID, CLASSNAME, PROFNAME, DAY, STARTTIME, ENDTIME, CLASSLOC\n"+
+                "FROM ((SELECT *\n" +
+                    "FROM (CLASS NATURAL JOIN USER_CLASS)\n"+
+                "WHERE USERID IN (SELECT USERID\n"+
+                "FROM USER_GROUP\n" +
+                "WHERE GROUPID =" + G_ID+")) A NATURAL JOIN CLASS_TIME)\n"+
+                "ORDER BY CLASSID ASC, DAY DESC";
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    })
+            }
+        })
+    })
+}
+
+module.exports.getGroupCalendar = function (G_ID, callback) {
+    db_init.reserve(function (connObj) {
+        var conn = connObj.conn;
+        conn.createStatement(function (err, statement) {
+            if (err) {
+                db_init.release(connObj, function () {
+                });
+                callback(false);
+            } else {
+                var query = "SELECT EVENT_ID AS \"id\", TITLE AS  \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\""+
+                    "FROM EVENTS WHERE PG_ID ="+G_ID;
+                console.log(query);
+                statement.executeQuery(query,
+                    function (err, resultset) {
+                        if (err) {
+                            console.log(err);
+                            db_init.release(connObj, function () {
+                            });
+                            callback(false);
+                        } else {
+                            resultset.toObjArray(function (err, results) {
+                                db_init.release(connObj, function (err) {
+                                    callback(results);
+                                });
+                            });
+                        }
+                    });
+            }
+        });
+    });
 };

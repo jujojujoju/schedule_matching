@@ -3,7 +3,7 @@ var router = express.Router();
 var url = require("url");
 var db_init = require('../db/db_init');
 var db_ = require("../db/dbquery");
-var moment = require('moment-timezone');
+//var moment = require('moment-timezone');
 function isLogin(req, res, next) {
     if (req.session.info != undefined) {
         next();
@@ -64,6 +64,7 @@ router.post('/update', isLogin, function (req, res, next) {
 
     res.statusCode = 200;
     db_.updateEvent(id,title,function(count){
+        console.log("count",count);
         console.log("update event success");
         res.send();
     });
@@ -78,7 +79,9 @@ router.post('/update_drag', isLogin, function (req, res, next) {
     var delta = req.body.delta;
     console.log(id,start,delta);
     res.statusCode = 200;
+
     db_.updateDragEvent(id,start,delta,function(count){
+        console.log("count",count);
         console.log("update event success");
         res.send({});
     });
@@ -95,6 +98,23 @@ router.post('/update_resize', isLogin, function (req, res, next) {
         console.log("update event success");
         res.send({});
     });
+});
+
+router.post('/isLeader', isLogin, function (req, res, next) {
+    console.log("/isLeader 들어옴!!!");
+    var G_ID = req.body.PG_ID;
+
+    db_.chkLeader(G_ID,req.session.info.userid,function(results){
+        if(results.length == 0){
+            console.log("리더가아닙니다!!!!!!!!!!!!!!!!!");
+            res.statusCode = 400;
+        }
+        else{
+            console.log("리더가입니다!!!!!!!!!!!!!!!!!");
+            res.statusCode = 200;
+        }
+        res.send({});
+    })
 });
 
 
