@@ -12,20 +12,6 @@ function isLogin(req, res, next) {
     }
 }
 
-// router.get('/', isLogin, function (req, res, next) {
-//     var data;
-//     db_.getClassList_distinct(req.session.info.userid,function(results){
-//         for(var i = 0 ; i < results.length;i++){
-//             console.log(results[i].CLASSID + "   "+results[i].CLASSNAME);
-//         }
-//         console.log(results.length);
-//         data= {
-//             _class : results
-//         };
-//         res.render('class/page', data);
-//     })
-// });
-
 router.get('/page', isLogin, function (req, res, next) {
     var params = url.parse(req.url, true).query;
     var cid = params["cid"];
