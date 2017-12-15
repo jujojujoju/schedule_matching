@@ -45,15 +45,8 @@
     function entering() {
         $(".chat_contents").scrollTop($(".chat_contents")[0].scrollHeight);
     }
-    var username = '<%= session.userName %>';
-    var userID = '<%= session.userid %>';
     var roomID = '<%= groupid %>';
     var roomname = '<%= groupname %>';
-    //    if (username == '오영택' || username == '조주영') {
-    //        roomName = 'test1'
-    //    } else {
-    //        roomName = 'test2'
-    //    }
     var socket = io.connect(window.location.origin);
     var users = []
     $(function () {
@@ -93,7 +86,6 @@
         }
     }
     function moveToBoard() {
-        var boardid = null
         $.ajax({
             url: '/board/getboardid',
             type: 'POST',
@@ -103,9 +95,7 @@
             success: function (result) {
                 var data = {
                     boardid : result[0].BOARDID
-//                    flag : 'class'
                 }
-//                boardid = result[0].BOARDID
                 location.href = '/board/?id=' + data.boardid
             }
         });

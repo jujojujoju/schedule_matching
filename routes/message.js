@@ -18,7 +18,6 @@ function isLogin(req, res, next) {
     }
 }
 
-
 router.get('/', isLogin, function (req, res, next) {
     var data = {
         id:req.session.info.userid,
@@ -45,11 +44,8 @@ router.get('/', isLogin, function (req, res, next) {
                     res.render('messages', data);
                 }
             });
-
-            // res.render('messages', data);
         }
     });
-
 });
 router.post('/send', isLogin, function (req, res, next) {
     var data = {

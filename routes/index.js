@@ -154,7 +154,6 @@ router.post('/login', isNotLogin, function (req, res, next) {
                             classname: classnameArray,
                             prof_time: prof_time
                         };
-
                         if (userName != null) {
                             req.session.info = userinfo;
                             var data = {

@@ -22,30 +22,19 @@ function isLogin(req, res, next) {
 router.get('/', isLogin, function (req, res, next) {
     var params = url.parse(req.url, true).query;
     console.log(params['id']);
-    // var page = params['page'];
-    // var boardflag = 'group';
-    // if (boardflag == 'group') {
     var data = {
         page: 1,
-        boardid: params['id'],
-        // flag: page
+        boardid: params['id']
     };
     db_.getBoardList(data, function (result) {
         if (result) {
             console.log("get list ok");
-            console.log("++=================" + result);
-            // if (data.flag == 'group')
-            // data.result = result
-            result.isgroup = true
-                res.render('board', result)
-            // else
-                // res.render('board', result)
+            result.isgroup = true;
+            res.render('board', result);
         } else {
             console.log('result error');
         }
     });
-    // }
-
 });
 
 router.post('/write', isLogin, function (req, res, next) {
