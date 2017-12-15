@@ -122,17 +122,37 @@ router.get('/calendar', isLogin, function (req, res, next) {
     //뽑은 그룹원들의 아이디를 이용해서 각 스케줄을 뽑아서 합친후에
     //위클리 스케줄로 넘겨준다. 이때 집합으로 만들어야함(중복없이)
     var data = [];
-    db_.getGroupCalendar(g_id, function (results) {
-        for (var i = 0; i < results.length; i++) {
+    var type;
+    var color;
+    db_.chkLeader(g_id,req.session.info.userid,function(results) {
+        if (results.length == 0) {
+            console.log("리더가아닙니다!!!!!!!!!!!!!!!!!");
+            type = 0;
+        }
+        else {
+            console.log("리더가입니다!!!!!!!!!!!!!!!!!");
+            type = 1;
+        }
+    })
+
+    db_.getGroupColor(g_id,function(results){
+        color = results[0].GROUPCOLOR;
+    })
+
+    db_.getGroupCalendar(g_id,function(results){
+        for(var i = 0 ; i < results.length;i++){
             results[i].allDay = true;
         }
-        console.log(results);
-
+        console.log("results",results);
+        console.log("color",color);
+        console.log("type",type);
         var obj = {
-            list: results
+            list : results,
+            _leader : type,
+            _color : color,
+            G_ID : g_id
         }
-
-        res.render('calendarTest', obj);
+        res.render('groupCalendar.ejs',obj);
     })
 
 });

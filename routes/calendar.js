@@ -23,7 +23,8 @@ router.get('/', isLogin, function (req, res, next) {
         console.log(results);
 
         var obj = {
-            list : results
+            list : results,
+            _type : "P"
         }
 
         res.render('calendarTest',obj);
@@ -31,16 +32,29 @@ router.get('/', isLogin, function (req, res, next) {
 });
 
 router.post('/add', isLogin, function (req, res, next) {
+    console.log("addddddddddddddddddddddddddddddddddddddd");
     var obj = req.body;
-    console.log(obj)
+    console.log("obj print");
+    console.log(obj);
     // var last = {
-    //     id : obj.id
+    //      id : obj.id
     // };
     res.statusCode = 200;
-    db_.addEvent(obj,req.session.info.userid,function(count){
-        console.log("add event success");
-        res.send({});
-    });
+    if(obj.GID == undefined){
+        db_.addEvent(obj,req.session.info.userid,function(count){
+            console.log("add event success");
+            res.send({});
+        });
+    }
+    else{
+        db_.addEvent(obj,obj.GID,function(count){
+            console.log("add event success");
+            res.send({});
+        });
+    }
+
+
+
 });
 
 router.post('/remove', isLogin, function (req, res, next) {
