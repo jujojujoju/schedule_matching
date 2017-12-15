@@ -14,7 +14,6 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <!--menu on the right-side-->
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
@@ -42,7 +41,8 @@
                             {
                             %>
                             <li>
-                                <a onclick="moveToCLASSPAGE('<%= _class[i].CLASSID %>')"><%= _class[i].CLASSNAME %></a>
+                                <a href="#"
+                                   onclick="moveToCLASSPAGE('<%= _class[i].CLASSID %>')"><%= _class[i].CLASSNAME %></a>
                             </li>
                             <%
                             }
@@ -50,7 +50,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a onclick="createGroup()">그룹생성</a>
+                        <a href="#" onclick="createGroup()">그룹생성</a>
                     </li>
                     <li>
                         <a href="/messages">쪽지함</a>
@@ -84,7 +84,8 @@
         <tr>
             <td><%= i + 1 %></td>
             <td>
-                <a onclick="moveToChat('<%= results[i].GROUPID %>', '<%= results[i].GROUPNAME %>')"><%= results[i].GROUPNAME %></a>
+                <a href="#"
+                   onclick="moveToChat('<%= results[i].GROUPID %>', '<%= results[i].GROUPNAME %>')"><%= results[i].GROUPNAME %></a>
             </td>
             <td><%= results[i].NAME %></td>
             <td><%= results[i].CREATEDATE %></td>
@@ -138,18 +139,19 @@
             });
         }
     }
-    function moveToCLASSPAGE(i) {
+    function moveToCLASSPAGE(id) {
         $.ajax({
             url: '/board/getboardid',
             type: 'POST',
             data: {
-                id: i
+                id: id
             },
             success: function (result) {
                 var data = {
+                    isgroup: false,
                     boardid: result[0].BOARDID
                 }
-                location.href = "/class/page/?cid=" + i + "&id=" + data.boardid;
+                location.href = "/class/page/?cid=" + id + "&id=" + data.boardid;
             }
         });
     }

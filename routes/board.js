@@ -21,7 +21,6 @@ function isLogin(req, res, next) {
 
 router.get('/', isLogin, function (req, res, next) {
     var params = url.parse(req.url, true).query;
-    console.log(params['id']);
     var data = {
         page: 1,
         boardid: params['id']
@@ -29,8 +28,7 @@ router.get('/', isLogin, function (req, res, next) {
     db_.getBoardList(data, function (result) {
         if (result) {
             console.log("get list ok");
-            result.isgroup = true;
-            res.render('board', result);
+            res.render('groupboard', result);
         } else {
             console.log('result error');
         }
@@ -60,8 +58,7 @@ router.post('/write', isLogin, function (req, res, next) {
 });
 
 router.post('/getboardid', isLogin, function (req, res, next) {
-    db_.getboardid(req.body.id, function (result) {
-        // console.log("===============" + result[0].BOARDID)
+    db_.getboardid(req.body, function (result) {
         res.send(result)
     })
 });

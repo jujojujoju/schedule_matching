@@ -72,28 +72,22 @@
     function getClassList(g_id) {
         location.href = '/class/schedule/?id='+g_id;
     }
-
     function moveToGroupCalendar(g_id){
         location.href = '/class/calendar/?id='+g_id;
     }
-
     function moveToBoard() {
         $.ajax({
             url: '/board/getboardid',
             type: 'POST',
             data: {
+                isgroup : true,
                 id: roomID
             },
             success: function (result) {
-                var data = {
-                    boardid : result[0].BOARDID
-                }
-                location.href = '/board/?id=' + data.boardid
+                location.href = '/board/?id=' + result[0].BOARDID
             }
         });
     }
-
-
 </script>
 
 

@@ -809,11 +809,16 @@ module.exports.getboardid = function (data, callback) {
                 callback(false);
             } else {
                 var query;
-                if (typeof data === 'number')
-                    query = "SELECT BOARDID FROM BOARD WHERE GROUPID = " + data;
+                if (data.isgroup)
+                {
+                    query = "SELECT BOARDID FROM BOARD WHERE GROUPID = " + data.id;
+                    console.log(typeof data.id)
+                }
                 else
-                    query = "SELECT BOARDID FROM BOARD WHERE CLASSID = '" + data + "'";
-
+                {
+                    console.log(typeof data.id);
+                    query = "SELECT BOARDID FROM BOARD WHERE CLASSID = '" + data.id + "'";
+                }
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {

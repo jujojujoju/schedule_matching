@@ -12,19 +12,19 @@ function isLogin(req, res, next) {
     }
 }
 
-router.get('/', isLogin, function (req, res, next) {
-    var data;
-    db_.getClassList_distinct(req.session.info.userid,function(results){
-        for(var i = 0 ; i < results.length;i++){
-            console.log(results[i].CLASSID + "   "+results[i].CLASSNAME);
-        }
-        console.log(results.length);
-        data= {
-            _class : results
-        };
-        res.render('class', data);
-    })
-});
+// router.get('/', isLogin, function (req, res, next) {
+//     var data;
+//     db_.getClassList_distinct(req.session.info.userid,function(results){
+//         for(var i = 0 ; i < results.length;i++){
+//             console.log(results[i].CLASSID + "   "+results[i].CLASSNAME);
+//         }
+//         console.log(results.length);
+//         data= {
+//             _class : results
+//         };
+//         res.render('class/page', data);
+//     })
+// });
 
 router.get('/page', isLogin, function (req, res, next) {
     var params = url.parse(req.url, true).query;
@@ -35,17 +35,14 @@ router.get('/page', isLogin, function (req, res, next) {
     var data = {
         page: 1,
         boardid: params['id']
-        // flag: page
     };
     db_.getBoardList(data, function (result) {
         if (result) {
-            console.log("get list ok");
-            console.log("++=================" + result);
-            // if (data.flag == 'group')
             db_.getClassInfo(cid, req.session.info.userid, function (results) {
                 //수업의 종류에 따라 구분하여 class_info 넣어줌
                 if (results.length == 1) {
                     class_info = {
+                        c_id: results[0].CLASSID,
                         c_Length: 1,
                         c_Name: results[0].CLASSNAME,
                         c_Prof: results[0].PROFNAME,
@@ -55,6 +52,7 @@ router.get('/page', isLogin, function (req, res, next) {
                 }
                 else {
                     class_info = {
+                        c_id: results[0].CLASSID,
                         c_Length: 2,
                         c_Name: results[0].CLASSNAME,
                         c_Prof: results[0].PROFNAME,
@@ -64,8 +62,7 @@ router.get('/page', isLogin, function (req, res, next) {
                 }
                 //board ejs로 render
                 result.class_info = class_info;
-                result.isgroup = false;
-                res.render('board', result)
+                res.render('classboard', result)
             });
         } else {
             console.log('result error');
@@ -79,8 +76,8 @@ router.post('/getsch', function (req, res, next) {
     var dataArray = req.body.userIDs;
     db_.getClassList(dataArray, function (results) {
         console.log("get class list complete");
-        for(var i = 0 ; i < results.length;i++){
-            console.log(results[i].CLASSID + "   "+results[i].CLASSNAME);
+        for (var i = 0; i < results.length; i++) {
+            console.log(results[i].CLASSID + "   " + results[i].CLASSNAME);
         }
         res.send(results);
     });
@@ -94,41 +91,39 @@ router.get('/schedule', isLogin, function (req, res, next) {
     //뽑은 그룹원들의 아이디를 이용해서 각 스케줄을 뽑아서 합친후에
     //위클리 스케줄로 넘겨준다. 이때 집합으로 만들어야함(중복없이)
     var data = [];
-    db_.getGroupPeopleWeek(g_id,function(results){
+    db_.getGroupPeopleWeek(g_id, function (results) {
         console.log("get group people week schedule success");
         console.log("group people schedule set!!!!!!!!!!!!!!!!!!!!!!");
-        for(var i = 0 ; i < results.length ; i++){
+        for (var i = 0; i < results.length; i++) {
             var temp = {};
             temp.dow = [];
-            if(results[i].DAY =='월'){
+            if (results[i].DAY == '월') {
                 temp.dow.push(1);
             }
-            if(results[i].DAY =='화'){
+            if (results[i].DAY == '화') {
                 temp.dow.push(2);
             }
-            if(results[i].DAY =='수'){
+            if (results[i].DAY == '수') {
                 temp.dow.push(3);
             }
-            if(results[i].DAY =='목'){
+            if (results[i].DAY == '목') {
                 temp.dow.push(4);
             }
-            if(results[i].DAY =='금'){
+            if (results[i].DAY == '금') {
                 temp.dow.push(5);
             }
 
             temp.title = results[i].CLASSNAME;
-            temp.description = results[i].CLASSID +"\n"+results[i].PROFNAME+"\n"+results[i].CLASSLOC+"\n";
+            temp.description = results[i].CLASSID + "\n" + results[i].PROFNAME + "\n" + results[i].CLASSLOC + "\n";
             temp.start = results[i].STARTTIME;
             temp.end = results[i].ENDTIME;
             data.push(temp);
         }
-        console.log("최종데이터!!!!!!!!!!!!!!!!1")
-        console.log(data);
         var obj = {
-            list : data,
-            title : req.session.info.userid
+            list: data,
+            title: req.session.info.userid
         }
-        res.render('weekTest',obj);
+        res.render('weekTest', obj);
     })
 
 });
@@ -141,22 +136,43 @@ router.get('/calendar', isLogin, function (req, res, next) {
     //뽑은 그룹원들의 아이디를 이용해서 각 스케줄을 뽑아서 합친후에
     //위클리 스케줄로 넘겨준다. 이때 집합으로 만들어야함(중복없이)
     var data = [];
-    db_.getGroupCalendar(g_id,function(results){
-        for(var i = 0 ; i < results.length;i++){
+    db_.getGroupCalendar(g_id, function (results) {
+        for (var i = 0; i < results.length; i++) {
             results[i].allDay = true;
         }
         console.log(results);
 
         var obj = {
-            list : results
+            list: results
         }
 
-        res.render('calendarTest',obj);
+        res.render('calendarTest', obj);
     })
 
 });
 
-
+router.post('/write', isLogin, function (req, res, next) {
+    var title = req.body.title;
+    var content = req.body.contents;
+    var boardid = req.body.boardid;
+    var classid = req.body.classid;
+    console.log(boardid);
+    var data = {
+        title: title,
+        content: content,
+        boardid: boardid,
+        writer: req.session.info.userid
+    };
+    db_.writepost(data, function (result) {
+        if (result) {
+            console.log("write ok");
+            res.redirect('/class/page/?cid=' + classid + "&id=" + data.boardid);
+        } else {
+            console.log(result);
+            console.log('result error');
+        }
+    });
+});
 
 
 module.exports = router;
