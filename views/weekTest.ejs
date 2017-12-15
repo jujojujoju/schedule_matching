@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<% include header.ejs%>
 
 <link rel='stylesheet' href='/fullcalendar/dist/fullcalendar.css'/>
 <script src="/javascripts/jquery-3.1.0.min.js"></script>
@@ -11,33 +10,37 @@
     console.log(ls);
     $(document).ready(function () {
         $('#calendar').fullCalendar({
+            //resourceAreaWidth: 230,
+            //slotWidth : 1,
+            height : $(window).height() - 160,
+            //width : $(window).width()/2,
+            aspectRatio: 2,
+            minTime : '09:00:00',
+            maxTime : '23:00:00',
+            scrollTime :'09:00:00',
             header: {
                 left: '',
                 center: 'title',
                 right: ''
             },
             events: ls ,
+            hiddenDays:[0,6],
             editable: false,
             allDayDefault: false,
-            defaultView: 'agendaWeek',
-            dayClick: function (start, end, jsEvent, view) {
-                var abc = prompt('Enter Title');
-                var allDay = !start.hasTime && !end.hasTime;
-                var newEvent = {};
-                newEvent.title = abc;
-                newEvent.start = moment(start).format();
-                newEvent.editable = true;
-                $('#calendar').fullCalendar('renderEvent', newEvent);
-            }
+            defaultView: 'agendaWeek'
         });
     });
 </script>
 
 <body>
 
-<div class="container">
+<div class="container" >
+    <div class="row">
+        <div class="col-xs-4">
+            <div id='calendar' style="border: 1px solid gold; padding: 10px; height: auto; overflow: auto;"></div>
+        </div>
+    </div>
 
-    <div id='calendar'></div>
 
 </div>
 
