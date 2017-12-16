@@ -91,5 +91,12 @@ router.post('/grouppwd', isLogin, function (req, res, next) {
     })
 });
 
+router.post('/getgroupfriend', function (req, res, next) {
+    db_.getgroupfriend(req.body.roomID, function (result) {
+        res.send(result)
+    })
+});
+
+
 module.exports = router;
 

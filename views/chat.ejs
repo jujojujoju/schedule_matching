@@ -12,10 +12,10 @@
                 <h3><p class="text-center"><strong><%= session.major %> <%= session.degree %>
                             학년 <%= session.userName %></strong></p></h3>
                 <h4 id="roominfo"></h4>
-                <!--<h5 id="length"></h5>-->
-                <!--<h5 id="members"></h5>-->
                 <h4>
                     <ul style="list-style-type:none" id="members"></ul>
+                    <ul style="list-style-type:none" id="groupmembers"></ul>
+
                 </h4>
             </div>
             <div class="row">
@@ -105,7 +105,23 @@
     var roomname = '<%= groupname %>';
     var socket = io.connect(window.location.origin);
     var users = []
+    var username = '<%= session.userName %>'
     $(function () {
+        $.ajax({
+            url: '/group/getgroupfriend',
+            type: 'POST',
+            data: {
+                roomID: roomID
+            },
+            success: function (result) {
+                $('#groupmembers').html("그룹 멤버")
+                console.log(result.length)
+                for (var i = 0; i < result.length; i++) {
+                        $('#groupmembers').append($('<li>').text(result[i].NAME));
+                }
+            }
+        });
+
         $("#m").focus();
         socket.emit('joinRoom', roomID);
         socket.on('msgAlert', function (msg) {
