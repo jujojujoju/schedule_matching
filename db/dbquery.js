@@ -2,6 +2,16 @@ var db_init = require('./db_init');
 var async = require("async");
 var crypto = require('crypto');
 
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 module.exports.chkId = function (ID, callback) {
     db_init.reserve(function (connObj) {
         var conn = connObj.conn;
@@ -44,7 +54,8 @@ module.exports.signup = function (input, callback) {
             } else {
                 var pass = crypto.createHash('sha256').update(input.userinfo.password).digest('base64');
                 var query = "INSERT INTO USERS VALUES(" + input.userinfo.userid + ",'"
-                    + input.userinfo.userName + "','" + pass + "'," + input.userinfo.degree + ",'" + input.userinfo.major + "')";
+                    + input.userinfo.userName + "','" + pass + "',"
+                    + input.userinfo.degree + ",'" + input.userinfo.major + "', '" + getRandomColor() + "')";
                 statement.executeUpdate(query,
                     function (err, count) {
                         if (err) {
@@ -288,14 +299,6 @@ module.exports.getGroupList = function (callback) {
 
 };
 
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
 
 module.exports.createGroup = function (data, callback) {
     db_init.reserve(function (connObj) {

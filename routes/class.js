@@ -11,7 +11,14 @@ function isLogin(req, res, next) {
         res.redirect("/");
     }
 }
-
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 router.get('/page', isLogin, function (req, res, next) {
     var params = url.parse(req.url, true).query;
     var cid = params["cid"];
@@ -81,6 +88,7 @@ router.get('/schedule', isLogin, function (req, res, next) {
     db_.getGroupPeopleWeek(g_id, function (results) {
         console.log("get group people week schedule success");
         console.log("group people schedule set!!!!!!!!!!!!!!!!!!!!!!");
+        var inputcolor = getRandomColor();
         for (var i = 0; i < results.length; i++) {
             var temp = {};
             temp.dow = [];
@@ -104,7 +112,9 @@ router.get('/schedule', isLogin, function (req, res, next) {
             temp.description = results[i].CLASSID + "\n" + results[i].PROFNAME + "\n" + results[i].CLASSLOC + "\n";
             temp.start = results[i].STARTTIME;
             temp.end = results[i].ENDTIME;
+            temp.color = inputcolor;
             data.push(temp);
+            inputcolor = getRandomColor()
         }
         var obj = {
             list: data,

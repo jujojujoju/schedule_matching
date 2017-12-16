@@ -144,6 +144,11 @@
             return false;
         });
     });
+    function view(posttitle, postcontent, writer) {
+        $("#viewtitle").html(posttitle)
+        $("#writer").html(writer)
+        $("#viewcontent").html(postcontent)
+    }
     function getClassList(g_id) {
         location.href = '/class/schedule/?id=' + g_id;
     }
