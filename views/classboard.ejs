@@ -46,7 +46,7 @@
                         <a href="/messages">쪽지함</a>
                     </li>
                     <li class="dropdown">
-                        <a  href="#" class="dropdown-toggle" data-toggle="dropdown"
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"
                            role="button" aria-expanded="false">
                             같은수업을 듣는 친구들<span class="caret"></span></a>
                         <ul id='classfriend' class="dropdown-menu" role="menu">
@@ -118,7 +118,7 @@
                 <input type="hidden" name="boardid" value="<%= boardid %>">
                 <input type="hidden" name="classid" value="<%= class_info.c_id %>">
 
-                <button type="submit" class="btn btn-default">Submit</button>
+                <button style="background-color: #4cae4c" type="submit" class="btn btn-default">Submit</button>
             </form>
         </div>
     </div>
@@ -127,6 +127,7 @@
 
 <script type="text/javascript">
     $(function () {
+        var userid = '<%= session.userid %>'
         $.ajax({
             url: '/class/getclassfriend',
             type: 'POST',
@@ -136,14 +137,15 @@
             success: function (result) {
                 console.log(result.length)
                 for (var i = 0; i < result.length; i++) {
-                    $('#classfriend').append($('<li>').append($('<a onclick="moveToMessage('+result[i].USERID+')" href="#">').text(result[i].USERID + result[i].NAME)))
+                    if (userid != result[i].USERID)
+                        $('#classfriend').append($('<li>').append($('<a onclick="moveToMessage(' + result[i].USERID + ')" href="#">').text(result[i].USERID + " " + result[i].NAME)))
                 }
             }
         });
 
     })
     function moveToMessage(id) {
-        location.href = '/messages/?receiverid='+id
+        location.href = '/messages/?receiverid=' + id
     }
     var classid = '<%= class_info.c_id %>'
     function logout() {

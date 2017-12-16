@@ -48,6 +48,7 @@ router.get('/page', isLogin, function (req, res, next) {
                 }
                 //board ejs로 render
                 result.class_info = class_info;
+                result.session = req.session.info;
                 res.render('classboard', result)
             });
         } else {

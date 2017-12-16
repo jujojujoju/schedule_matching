@@ -6827,5 +6827,84 @@ h4{
 
 h5{
   font-size: 20px;
+  text-align: left;
+}
+
+
+
+
+input[type=text], input[type=password] {
+  text-align: center;
+  width: 100%;
+  padding: 10px 10px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+h6{
+  font-size: 44px;
+  text-align: center;
+  font-style: italic;
+  color: #b92c28;
+}
+button[type=submit] {
+  background-color: red;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+
+}
+
+/* Add padding to containers */
+.container {
+  padding: 10px;
+}
+
+.center {
+  margin: auto;
+  width: 50%;
+  border: 3px solid green;
+  padding: 10px;
+}
+
+.form-group{
+  padding: 10px;
+  bottom: 0;
+  border: 3px solid #f1f1f1;
+  text-align: center;
+}
+
+form {
+  padding: 10px;
+  bottom: 0;
+  border: 3px solid #f1f1f1;
+}
+
+h2{
+  color: #b92c28;
+  font-size: 44px;
+  text-align: center;
+}
+
+h3{
+  text-align: center;
+}
+
+h4{
+  font-family: verdana, sans-serif;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+  top: -10px;
+}
+
+h5{
+  text-align: left;
 }
 /*# sourceMappingURL=bootstrap.css.map */
+

@@ -1,12 +1,19 @@
 <% include header.ejs %>
-
+<style>
+    .jumbotron{
+        background-image: url('images/khummunity.png');
+        background-size: cover;
+        height: 150px;
+        margin-top: 0;
+    }
+</style>
 <body>
 <div class="container">
     <div class="jumbotron">
-        <p class="text-center" style=" font-family: musictime; font-size: 14rem; font-weight: bold">
-            Khummunity
+    </div>
+    <div>
+        <p style=" font-family: musictime; font-size: 200%; font-weight: bold" class="text-center"><strong><%= session.major %> <%= session.degree %>학년 <%= session.userName %></strong>
         </p>
-        <p class="text-center"><strong><%= session.major %> <%= session.degree %>학년 <%= session.userName %></strong></p>
     </div>
 </div>
 
