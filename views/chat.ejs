@@ -8,33 +8,38 @@
 <div class="container">
     <div class="row">
         <div class="col-xs-8 text-center">
-            <h5><%= session.userid %></h5>
-            <h5><%= session.userName %></h5>
-            <h5><%= session.major %></h5>
-            <h5><%= session.degree %>학년</h5>
-
-            <h5 id="broadcast"></h5>
-            <h5 id="roominfo"></h5>
-            <h5 id="length"></h5>
-            <h5 id="members"></h5>
-            <ul id="classes"></ul>
-        </div>
-        <div class="col-xs-4">
             <div class="row">
-                <div class="chat_contents">
-                    <ul id="messages"></ul>
-                </div>
-                <form id="messageForm" action="">
-                    <input style=" padding: 10px; width: 80%;" id="m" autocomplete="off"/>
-                    <button onclick="entering()" class="btn btn-default" style="padding: 10px; width: 18%;">Send
-                    </button>
-                </form>
+                <h3><p class="text-center"><strong><%= session.major %> <%= session.degree %>
+                            학년 <%= session.userName %></strong></p></h3>
+                <h4 id="roominfo"></h4>
+                <!--<h5 id="length"></h5>-->
+                <!--<h5 id="members"></h5>-->
+                <h4>
+                    <ul style="list-style-type:none" id="members"></ul>
+                </h4>
+            </div>
+            <div class="row">
+                <button type="button" class="btn btn-primary" onclick="getClassList('<%= groupid %>')">통합 시간표</button>
+                <button type="button" class="btn btn-primary" onclick="moveToGroupCalendar('<%= groupid %>')">그룹 달력
+                </button>
+
             </div>
         </div>
+        <div class="col-xs-4">
+            <div class="chat_contents">
+                <ul id="messages"></ul>
+            </div>
+            <form id="messageForm" action="">
+                <input style=" padding: 10px; width: 80%;" id="m" autocomplete="off"/>
+                <button onclick="entering()" class="btn btn-default" style="padding: 10px; width: 18%;">Send
+                </button>
+            </form>
+        </div>
+
     </div>
     <div class="row">
-        <div class="col-xs-12">
-            <div class="panel panel-success">
+        <div class="col-xs-7">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 id="viewtitle" class="panel-title">제목</h3>
                 </div>
@@ -69,8 +74,7 @@
                 %>
             </table>
         </div>
-        <div class="col-xs-3">
-
+        <div style="padding-left: 10% " class="col-xs-5">
             <form class="messageform" style="margin:0;padding:0;" method="post" action="/board/write">
                 <div class="form-group">
                     <label>제목</label>
@@ -78,17 +82,18 @@
                 </div>
                 <div class="form-group">
                     <label>내용</label>
-                    <textarea style="border: 1px solid #f2f2f2; border-radius:5px;" rows="10" cols="50" class="form-control" id="contents" name="contents"
+                    <textarea style="border: 1px solid #f2f2f2; border-radius:5px;" rows="10" cols="50"
+                              class="form-control" id="contents" name="contents"
                               placeholder="Contents"></textarea>
                 </div>
+                <input type="hidden" name="groupid" value="<%= groupid %>">
+                <input type="hidden" name="groupname" value="<%= groupname %>">
                 <input type="hidden" name="boardid" value="<%= boardid %>">
-                <button type="submit" class="btn btn-default">Submit</button>
+                <button style="background-color: #28a4c9" type="submit" class="btn btn-default">Submit</button>
             </form>
         </div>
     </div>
 </div>
-<button type="button" class="btn btn-danger" onclick="getClassList('<%= groupid %>')">이방에 속한 모든사람 수업 가져오기</button>
-<button type="button" class="btn btn-danger" onclick="moveToGroupCalendar('<%= groupid %>')">그룹 달력 가기</button>
 
 </body>
 
@@ -107,11 +112,13 @@
             $('#messages').append($('<li>').text(msg));
         });
         socket.on('heartbeat', function (msg, room_id, roomlength, roommemberlist, roomidlist) {
-            $('#broadcast').html("공지 : " + msg)
-            $('#roominfo').html("이 방의 아이디는 " + room_id + "이고 이름은" + roomname + " 입니다")
+            $('#roominfo').html("그룹 이름 : " + roomname)
             users = roomidlist;
-            $('#members').html("이 방의 멤버들은 " + roommemberlist + " 입니다")
-            $('#length').html("이 방의 멤버숫자는  " + roomlength + " 입니다")
+//            $('#length').html("현재 접속 멤버 :  " + roomlength)
+            $('#members').html("현재 접속 멤버")
+            for (var i = 0; i < roommemberlist.length; i++) {
+                $('#members').append($('<li>').text(roommemberlist[i]));
+            }
         });
         $('#messageForm').submit(function () {
             if ($('#m').val() != '') {
@@ -122,23 +129,10 @@
         });
     });
     function getClassList(g_id) {
-        location.href = '/class/schedule/?id='+g_id;
+        location.href = '/class/schedule/?id=' + g_id;
     }
-    function moveToGroupCalendar(g_id){
-        location.href = '/class/calendar/?id='+g_id;
-    }
-    function moveToBoard() {
-        $.ajax({
-            url: '/board/getboardid',
-            type: 'POST',
-            data: {
-                isgroup : true,
-                id: roomID
-            },
-            success: function (result) {
-                location.href = '/board/?id=' + result[0].BOARDID
-            }
-        });
+    function moveToGroupCalendar(g_id) {
+        location.href = '/class/calendar/?id=' + g_id;
     }
 </script>
 

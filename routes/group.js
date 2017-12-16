@@ -39,8 +39,12 @@ router.get('/', isLogin, function (req, res, next) {
                     userid : req.session.info.userid,
                     groupid : data.groupid
                 };
-                db_.insertingroup(input, function (count) {
-                    if(count){
+                db_.insertingroup(input, function (err, count) {
+                    if(err){
+                        console.log("errrrrrrrrAsdfasdfasdf")
+                    }
+                    else{
+                        console.log("Asdfasdfasdf")
                         result = Object.assign({}, data, result);
                         // result.session = req.session.info
                         res.render('chat', result);

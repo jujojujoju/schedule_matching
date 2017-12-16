@@ -1005,7 +1005,7 @@ module.exports.insertingroup = function (data, callback) {
                             console.log(err);
                             callback(err);
                         } else {
-                            callback(count);
+                            callback(null, count);
                         }
                     });
             }

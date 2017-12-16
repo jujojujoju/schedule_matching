@@ -39,6 +39,8 @@ router.post('/write', isLogin, function (req, res, next) {
     var title = req.body.title;
     var content = req.body.contents;
     var boardid = req.body.boardid;
+    var groupid = req.body.groupid;
+    var groupname = req.body.groupname;
     console.log(boardid);
     var data = {
         title: title,
@@ -49,7 +51,8 @@ router.post('/write', isLogin, function (req, res, next) {
     db_.writepost(data, function (result) {
         if (result) {
             console.log("write ok");
-            res.redirect('/board/?id=' + boardid);
+            // res.redirect('/board/?id=' + boardid);
+            res.redirect("/group/?id=" + groupid + "&name=" + groupname)
         } else {
             console.log(result);
             console.log('result error');
