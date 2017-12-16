@@ -5,6 +5,7 @@ var cheerio = require("cheerio");
 var url = require("url");
 var db_init = require('../db/db_init');
 var db_ = require("../db/dbquery");
+var crypto = require('crypto');
 
 function noCache(res) {
     res.header("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -184,7 +185,8 @@ router.post('/login', isNotLogin, function (req, res, next) {
             );
         }
         else {
-            if (password == results[0].PASSWORD) {
+            var hash = crypto.createHash('sha256').update(password).digest('base64');
+            if (hash == results[0].PASSWORD) {
                 console.log("our user");
                 req.session.info = {
                     userid: results[0].USERID, password: results[0].PASSWORD,

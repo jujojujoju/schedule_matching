@@ -1,5 +1,6 @@
 var db_init = require('./db_init');
 var async = require("async");
+var crypto = require('crypto');
 
 module.exports.chkId = function (ID, callback) {
     db_init.reserve(function (connObj) {
@@ -41,8 +42,9 @@ module.exports.signup = function (input, callback) {
                 });
                 callback(false);
             } else {
+                var pass = crypto.createHash('sha256').update(input.userinfo.password).digest('base64');
                 var query = "INSERT INTO USERS VALUES(" + input.userinfo.userid + ",'"
-                    + input.userinfo.userName + "','" + input.userinfo.password + "'," + input.userinfo.degree + ",'" + input.userinfo.major + "')";
+                    + input.userinfo.userName + "','" + pass + "'," + input.userinfo.degree + ",'" + input.userinfo.major + "')";
                 statement.executeUpdate(query,
                     function (err, count) {
                         if (err) {
@@ -232,7 +234,7 @@ module.exports.getClassInfo = function (CID, USERID, callback) {
                     "NATURAL JOIN " +
                     "(SELECT * " +
                     "FROM CLASS_TIME) B)C " +
-                    "WHERE C.CLASSID = '" + CID + "'\n"+
+                    "WHERE C.CLASSID = '" + CID + "'\n" +
                     "ORDER BY DAY DESC";
                 console.log(query);
                 statement.executeQuery(query,
@@ -654,7 +656,7 @@ module.exports.addEvent = function (event_info, user_id, callback) {
             } else {
                 var s = "INSERT INTO EVENTS VALUES(EVENT_SEQ.nextval,'" +
                     event_info.title + "',TO_DATE('" + event_info.start + "')," +
-                    "TO_DATE('" + event_info.end + "')+"+1+",\'asd\','"+event_info.backgroundColor+"','"+event_info.type+"'," + user_id + ")";
+                    "TO_DATE('" + event_info.end + "')+" + 1 + ",\'asd\','" + event_info.backgroundColor + "','" + event_info.type + "'," + user_id + ")";
                 console.log(s);
                 statement.executeUpdate(s,
                     function (err, count) {
@@ -931,9 +933,9 @@ module.exports.getGroupCalendar = function (G_ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT EVENT_ID AS \"id\", TITLE AS \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\"\n"+
-                    "FROM EVENTS\n"+
-                    "WHERE PG_ID = "+G_ID;
+                var query = "SELECT EVENT_ID AS \"id\", TITLE AS \"title\", T_START AS \"start\",T_END AS \"end\", COLOR AS \"backgroundColor\" , PG_ID AS \"description\"\n" +
+                    "FROM EVENTS\n" +
+                    "WHERE PG_ID = " + G_ID;
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -964,7 +966,7 @@ module.exports.getGroupColor = function (G_ID, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT GROUPCOLOR FROM GRP WHERE GROUPID="+G_ID;
+                var query = "SELECT GROUPCOLOR FROM GRP WHERE GROUPID=" + G_ID;
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
@@ -994,7 +996,8 @@ module.exports.insertingroup = function (data, callback) {
                 console.log(err);
                 callback(err);
             } else {
-                var query = "INSERT INTO USER_GROUP VALUES (" + data.userid + "," + data.groupid + ")";
+                var query = "INSERT INTO USER_GROUP (USERID, GROUPID) SELECT " + data.userid + "," + data.groupid + " " +
+                    "FROM dual WHERE NOT exists (SELECT * FROM USER_GROUP WHERE USERID = " + data.userid + " AND GROUPID=" + data.groupid + ")";
                 console.log(query);
                 statement.executeUpdate(query,
                     function (err, count) {
