@@ -1054,7 +1054,7 @@ module.exports.getgroupfriend = function (data, callback) {
                 });
                 callback(false);
             } else {
-                var query = "SELECT DISTINCT u.NAME, u.USERID FROM user_group ug JOIN users u on ug.groupid=" + data;
+                var query = "SELECT DISTINCT u.NAME, u.USERID FROM user_group ug JOIN users u on ug.userid=u.userid where ug.groupid=" + data;
                 console.log(query);
                 statement.executeQuery(query,
                     function (err, resultset) {
