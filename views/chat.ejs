@@ -63,9 +63,9 @@
                 for(var i = 0; i < results.length; i++)
                 {
                 %>
-                <tr onclick="view('<%= results[i].PTI %>', '<%= results[i].PCO %>', '<%= results[i].PW %>')">
+                <tr href="#" onclick="view('<%= results[i].PTI %>', '<%= results[i].PCO %>', '<%= results[i].PW %>')">
                     <td><%= i + 1 %></td>
-                    <td><%= results[i].PTI %></td>
+                    <td href="#"><%= results[i].PTI %></td>
                     <td><%= results[i].PW %></td>
                     <td><%= results[i].PT %></td>
                 </tr>
