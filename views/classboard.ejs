@@ -6,6 +6,7 @@
         overflow-x: hidden;
         overflow-y: auto;
     }
+
     .panel-success {
         width: 777px;
         height: 300px;
@@ -43,6 +44,14 @@
                     </li>
                     <li>
                         <a href="/messages">쪽지함</a>
+                    </li>
+                    <li class="dropdown">
+                        <a  href="#" class="dropdown-toggle" data-toggle="dropdown"
+                           role="button" aria-expanded="false">
+                            같은수업을 듣는 친구들<span class="caret"></span></a>
+                        <ul id='classfriend' class="dropdown-menu" role="menu">
+
+                        </ul>
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -102,7 +111,8 @@
                 </div>
                 <div class="form-group">
                     <label>내용</label>
-                    <textarea style="border: 1px solid #f2f2f2; border-radius:5px;"rows="10" cols="50" class="form-control" id="contents" name="contents"
+                    <textarea style="border: 1px solid #f2f2f2; border-radius:5px;" rows="10" cols="50"
+                              class="form-control" id="contents" name="contents"
                               placeholder="Contents"></textarea>
                 </div>
                 <input type="hidden" name="boardid" value="<%= boardid %>">
@@ -116,6 +126,26 @@
 </body>
 
 <script type="text/javascript">
+    $(function () {
+        $.ajax({
+            url: '/class/getclassfriend',
+            type: 'POST',
+            data: {
+                classid: classid
+            },
+            success: function (result) {
+                console.log(result.length)
+                for (var i = 0; i < result.length; i++) {
+                    $('#classfriend').append($('<li>').append($('<a onclick="moveToMessage('+result[i].USERID+')" href="#">').text(result[i].USERID + result[i].NAME)))
+                }
+            }
+        });
+
+    })
+    function moveToMessage(id) {
+        location.href = '/messages/?receiverid='+id
+    }
+    var classid = '<%= class_info.c_id %>'
     function logout() {
         location.href = "/logout";
     }

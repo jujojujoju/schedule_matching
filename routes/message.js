@@ -19,6 +19,8 @@ function isLogin(req, res, next) {
 }
 
 router.get('/', isLogin, function (req, res, next) {
+    var params = url.parse(req.url, true).query;
+    console.log(params['receiverid']);
     var data = {
         id:req.session.info.userid,
         flag : 0
@@ -41,6 +43,7 @@ router.get('/', isLogin, function (req, res, next) {
                 else {
                     console.log("get message list complete");
                     data.sendedmessages = sendedmessages;
+                    data.autoreceiverid = params['receiverid'];
                     res.render('messages', data);
                 }
             });

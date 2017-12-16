@@ -124,7 +124,7 @@ router.get('/calendar', isLogin, function (req, res, next) {
     var data = [];
     var type;
     var color;
-    db_.chkLeader(g_id,req.session.info.userid,function(results) {
+    db_.chkLeader(g_id, req.session.info.userid, function (results) {
         if (results.length == 0) {
             console.log("리더가아닙니다!!!!!!!!!!!!!!!!!");
             type = 0;
@@ -135,24 +135,24 @@ router.get('/calendar', isLogin, function (req, res, next) {
         }
     })
 
-    db_.getGroupColor(g_id,function(results){
+    db_.getGroupColor(g_id, function (results) {
         color = results[0].GROUPCOLOR;
     })
 
-    db_.getGroupCalendar(g_id,function(results){
-        for(var i = 0 ; i < results.length;i++){
+    db_.getGroupCalendar(g_id, function (results) {
+        for (var i = 0; i < results.length; i++) {
             results[i].allDay = true;
         }
-        console.log("results",results);
-        console.log("color",color);
-        console.log("type",type);
+        console.log("results", results);
+        console.log("color", color);
+        console.log("type", type);
         var obj = {
-            list : results,
-            _leader : type,
-            _color : color,
-            G_ID : g_id
+            list: results,
+            _leader: type,
+            _color: color,
+            G_ID: g_id
         }
-        res.render('groupCalendar.ejs',obj);
+        res.render('groupCalendar.ejs', obj);
     })
 
 });
@@ -180,7 +180,11 @@ router.post('/write', isLogin, function (req, res, next) {
     });
 });
 
-
+router.post('/getclassfriend', function (req, res, next) {
+    db_.getclassfriend(req.body.classid, function (result) {
+        res.send(result)
+    })
+});
 module.exports = router;
 
 

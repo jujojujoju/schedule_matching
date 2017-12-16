@@ -8,9 +8,10 @@
         /*width: 100%;*/
         /*float: right;*/
     }
+
     /*.table {*/
-        /*float:left;*/
-        /*width: 70%;*/
+    /*float:left;*/
+    /*width: 70%;*/
     /*}*/
     /*class[class="container"]. {border-style: dashed;}*/
 </style>
@@ -125,6 +126,15 @@
 </div>
 </body>
 <script type="text/javascript">
+    var autoreceiverid = '<%= autoreceiverid %>'
+
+    console.log(autoreceiverid)
+    $(function () {
+        if (!(autoreceiverid == null || autoreceiverid == undefined || autoreceiverid == '')) {
+            $("#receiverid").focus();
+            $("#receiverid").val(autoreceiverid);
+        }
+    })
     function resendMessage(id, contents) {
         $("#receiverid").focus();
         $("#receiverid").val(id);
